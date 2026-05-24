@@ -6,9 +6,9 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -16,60 +16,88 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    // application.propertiesから秘密鍵と有効期限を読み込む（なければデフォルト値を使用）
-    @Value("${jwt.secret:defaultSecretKeyWhichNeedsToBeVeryLongAndSecure32Bytes}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration-ms:86400000}") // デフォルトは24時間
-    private int jwtExpirationInMs;
+    @Value("${jwt.expiration-ms}")
+    private long jwtExpirationInMs;
 
     private Key key;
 
     @PostConstruct
     public void init() {
-        // 文字列のシークレットキーからHMAC SHA用のキーを生成
-        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        this.key = Keys.hmacShaKeyFor(
+                jwtSecret.getBytes(StandardCharsets.UTF_8)
+        );
     }
 
-    // トークンの生成
+    // JWT生成
     public String generateToken(Authentication authentication) {
-        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+
+        CustomUserDetails userPrincipal =
+                (CustomUserDetails) authentication.getPrincipal();
+
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+        Date expiryDate =
+                new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername()) // ここではEmailをSubjectとして扱う
-                .setIssuedAt(new Date())
+                .setSubject(userPrincipal.getUsername())
+                .claim("userId", userPrincipal.getId())
+                .claim("role",
+                        userPrincipal.getAuthorities()
+                                .iterator()
+                                .next()
+                                .getAuthority())
+                .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // トークンからEmail（Username）を取得
+    // Email取得
     public String getUsernameFromJWT(String token) {
-        Claims claims = Jwts.parserBuilder()
+        return getClaims(token).getSubject();
+    }
+
+    // userId取得
+    public Long getUserIdFromJWT(String token) {
+        return getClaims(token).get("userId", Long.class);
+    }
+
+    // claims共通取得
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-
-        return claims.getSubject();
     }
 
-    // トークンの検証
-    public boolean validateToken(String authToken) {
+    // JWT検証
+    public boolean validateToken(String token) {
+
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
+            getClaims(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
+
+        } catch (SecurityException e) {
             log.error("Invalid JWT signature");
+
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token");
+
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token");
+
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token");
+
         } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty.");
+            log.error("JWT claims string is empty");
         }
+
         return false;
     }
 }
