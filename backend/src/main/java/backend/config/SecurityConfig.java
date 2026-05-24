@@ -1,5 +1,6 @@
 package backend.config;
 
+import backend.security.JwtAuthenticationEntryPoint;
 import backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,45 +22,113 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    // パスワードのハッシュ化アルゴリズムをBean定義
+    /**
+     * Password Encoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 
-    // ログイン処理等でAuthenticationManagerを呼び出せるようにBean定義
+    /**
+     * AuthenticationManager
+     */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig
+    ) throws Exception {
+
         return authConfig.getAuthenticationManager();
     }
 
+    /**
+     * Security Filter
+     */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http)
+            throws Exception {
+
         http
-                // REST APIのためCSRFは無効化、セッションもステートレス（JWT）に設定
+
+                // CSRF無効
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // パスごとの認可（アクセス権限）設定
-                .authorizeHttpRequests(authz -> authz
-                        // 認証不要（Permit All）
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                // CORS有効
+                .cors(cors -> {
+                })
 
-                        // 管理者のみ（ROLE_ADMIN）
-                        .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
+                // Sessionを使用しない
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
 
-                        // ログインユーザー・管理者ともにアクセス可能（ROLE_USER, ROLE_ADMIN）
-                        .requestMatchers("/orders/**", "/cart/**").hasAnyRole("USER", "ADMIN")
+                // 認証エラーハンドリング
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(
+                                jwtAuthenticationEntryPoint
+                        )
+                )
 
-                        // それ以外のリクエストは認証必須
+                // 認可設定
+                .authorizeHttpRequests(auth -> auth
+
+                        // 認証不要
+                        .requestMatchers(
+                                "/api/auth/**"
+                        ).permitAll()
+
+                        // 商品閲覧
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/products/**"
+                        ).permitAll()
+
+                        // 管理者のみ
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/products/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/products/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/products/**"
+                        ).hasRole("ADMIN")
+
+                        // USER / ADMIN
+                        .requestMatchers(
+                                "/orders/**",
+                                "/cart/**"
+                        ).hasAnyRole("USER", "ADMIN")
+
+                        // H2 Console（開発時）
+                        .requestMatchers(
+                                "/h2-console/**"
+                        ).permitAll()
+
+                        // その他
                         .anyRequest().authenticated()
                 )
-                // デフォルトの認証フィルターの前に、自作のJWTフィルターを差し込む
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+                // H2 Console用
+                .headers(headers ->
+                        headers.frameOptions(frame -> frame.disable())
+                )
+
+                // JWT Filter
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
