@@ -19,3 +19,11 @@ spring:
       properties:
         hibernate:
           format_sql: true
+
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: backend.entity
+
+logging:
+  level:
+    backend.mapper: DEBUG

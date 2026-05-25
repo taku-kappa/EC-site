@@ -15,17 +15,34 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.List;
+
+/**
+ * Spring Security 設定クラス
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    /**
+     * JWT認証フィルター
+     */
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    /**
+     * 認証エントリポイント
+     */
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     /**
-     * Password Encoder
+     * PasswordEncoder
+     *
+     * @return PasswordEncoder
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -35,6 +52,10 @@ public class SecurityConfig {
 
     /**
      * AuthenticationManager
+     *
+     * @param authConfig AuthenticationConfiguration
+     * @return AuthenticationManager
+     * @throws Exception 例外
      */
     @Bean
     public AuthenticationManager authenticationManager(
@@ -45,11 +66,54 @@ public class SecurityConfig {
     }
 
     /**
-     * Security Filter
+     * CORS設定
+     *
+     * React(8080) からのアクセス許可
+     *
+     * @return CorsConfigurationSource
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http)
-            throws Exception {
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration configuration =
+                new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+                List.of("http://localhost:8080")
+        );
+
+        configuration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "DELETE")
+        );
+
+        configuration.setAllowedHeaders(
+                List.of("*")
+        );
+
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
+
+        return source;
+    }
+
+    /**
+     * Security Filter Chain
+     *
+     * @param http HttpSecurity
+     * @return SecurityFilterChain
+     * @throws Exception 例外
+     */
+    @Bean
+    public SecurityFilterChain filterChain(
+            HttpSecurity http
+    ) throws Exception {
 
         http
 
@@ -85,43 +149,36 @@ public class SecurityConfig {
                         // 商品閲覧
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/products/**"
+                                "/api/products/**"
                         ).permitAll()
 
                         // 管理者のみ
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/products/**"
+                                "/api/products/**"
                         ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "/products/**"
+                                "/api/products/**"
                         ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.DELETE,
-                                "/products/**"
+                                "/api/products/**"
                         ).hasRole("ADMIN")
 
                         // USER / ADMIN
                         .requestMatchers(
-                                "/orders/**",
-                                "/cart/**"
-                        ).hasAnyRole("USER", "ADMIN")
-
-                        // H2 Console（開発時）
-                        .requestMatchers(
-                                "/h2-console/**"
-                        ).permitAll()
+                                "/api/orders/**",
+                                "/api/cart/**"
+                        ).hasAnyRole(
+                                "USER",
+                                "ADMIN"
+                        )
 
                         // その他
                         .anyRequest().authenticated()
-                )
-
-                // H2 Console用
-                .headers(headers ->
-                        headers.frameOptions(frame -> frame.disable())
                 )
 
                 // JWT Filter

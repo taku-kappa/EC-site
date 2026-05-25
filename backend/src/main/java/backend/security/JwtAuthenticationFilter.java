@@ -16,16 +16,23 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * JWT認証フィルター
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    // Bearer Prefix
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtTokenProvider tokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
 
+    /**
+     * フィルター処理
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -35,18 +42,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
 
+            // JWT取得
             String jwt = resolveToken(request);
 
+            // JWT存在 + JWT有効 + 未認証
             if (StringUtils.hasText(jwt)
                     && tokenProvider.validateToken(jwt)
-                    && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    && SecurityContextHolder
+                    .getContext()
+                    .getAuthentication() == null) {
 
+                // JWTからEmail取得
                 String email =
                         tokenProvider.getUsernameFromJWT(jwt);
 
+                // ユーザー情報取得
                 UserDetails userDetails =
-                        userDetailsService.loadUserByUsername(email);
+                        userDetailsService
+                                .loadUserByUsername(email);
 
+                // 認証情報生成
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -59,14 +74,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 .buildDetails(request)
                 );
 
-                SecurityContextHolder.getContext()
+                // SecurityContextへセット
+                SecurityContextHolder
+                        .getContext()
                         .setAuthentication(authentication);
 
-                log.debug("Authenticated user: {}", email);
+                log.debug(
+                        "Authenticated user: {}",
+                        email
+                );
             }
 
         } catch (Exception ex) {
-
             log.error(
                     "Could not set user authentication in security context",
                     ex
@@ -76,15 +95,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String resolveToken(HttpServletRequest request) {
+    /**
+     * Authorization Header から JWT取得
+     *
+     * @param request HttpServletRequest
+     * @return JWT
+     */
+    private String resolveToken(
+            HttpServletRequest request
+    ) {
 
         String bearerToken =
                 request.getHeader("Authorization");
 
+        // Bearer Token チェック
         if (StringUtils.hasText(bearerToken)
                 && bearerToken.startsWith(BEARER_PREFIX)) {
 
-            return bearerToken.substring(BEARER_PREFIX.length());
+            return bearerToken.substring(
+                    BEARER_PREFIX.length()
+            );
         }
 
         return null;

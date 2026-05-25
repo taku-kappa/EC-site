@@ -1,7 +1,7 @@
 package backend.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,52 +10,44 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
-@Table(name = "users")
+/**
+ * ユーザー Entity
+ */
 @Getter
 @Setter
+@NoArgsConstructor
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // ユーザーID
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    // ユーザー名
     private String name;
 
-    @Column(nullable = false, unique = true, length = 255)
+    // メールアドレス
     private String email;
 
-    @Column(nullable = false, length = 255)
+    // パスワード
     private String password;
 
-    // ROLE_USER, ROLE_ADMIN
-    @Column(nullable = false, length = 20)
+    //権限(ROLE_USER / ROLE_ADMIN)
     private String role;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    // 作成日時
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    // 更新日時
     private LocalDateTime updatedAt;
 
     /**
-     * Spring Security用 権限取得
+     * Spring Security 用 権限取得
+     *
+     * @return 権限情報
      */
     public Collection<? extends GrantedAuthority> getAuthorities() {
+
         return List.of(
                 new SimpleGrantedAuthority(role)
         );
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 }

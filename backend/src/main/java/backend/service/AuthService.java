@@ -3,7 +3,7 @@ package backend.service;
 import backend.dto.request.LoginRequest;
 import backend.dto.request.RegisterRequest;
 import backend.entity.User;
-import backend.repository.UserRepository;
+import backend.mapper.UserMapper;
 import backend.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,57 +14,79 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 認証 Service
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
 
     /**
      * ユーザー登録処理
-     * @return 登録されたユーザーのID
+     *
+     * @param request ユーザー登録リクエスト
+     * @return 登録ユーザーID
      */
     @Transactional
     public Long registerUser(RegisterRequest request) {
-        // 1. メールアドレスの重複チェック
-        if (userRepository.existsByEmail(request.getEmail())) {
-            // ※本来は専用のカスタム例外を投げ、GlobalExceptionHandlerで処理するのがベストです
-            throw new RuntimeException("Email is already in use.");
+
+        // メールアドレス重複チェック
+        if (userMapper.countByEmail(request.getEmail()) > 0) {
+            throw new RuntimeException(
+                    "Email is already in use."
+            );
         }
 
-        // 2. ユーザーエンティティの生成と値のセット
+        // ユーザー生成
         User user = new User();
+
         user.setName(request.getName());
+
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // ハッシュ化
-        user.setRole("ROLE_USER"); // 新規登録は一般ユーザー権限
 
-        // 3. DBへ保存
-        User savedUser = userRepository.save(user);
+        // パスワードをハッシュ化
+        user.setPassword(
+                passwordEncoder.encode(request.getPassword())
+        );
 
-        return savedUser.getId();
+        // 一般ユーザー権限
+        user.setRole("ROLE_USER");
+
+        // DB登録
+        userMapper.insertUser(user);
+
+        return user.getId();
     }
 
     /**
      * ログイン処理
-     * @return 生成されたJWTトークン
+     *
+     * @param request ログインリクエスト
+     * @return JWTトークン
      */
-    public String authenticateUser(LoginRequest request) {
-        // 1. 入力されたEmailとPasswordで認証を試みる (UserDetailsServiceImplが呼ばれます)
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+    public String authenticateUser(
+            LoginRequest request
+    ) {
 
-        // 2. 認証情報をSecurityContextにセット
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // 認証実行
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                request.getEmail(),
+                                request.getPassword()
+                        )
+                );
 
-        // 3. 認証情報をもとにJWTを生成して返す
+        // SecurityContextへセット
+        SecurityContextHolder.getContext()
+                .setAuthentication(authentication);
+
+        // JWT生成
         return tokenProvider.generateToken(authentication);
     }
 }
