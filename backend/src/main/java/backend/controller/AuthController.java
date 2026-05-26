@@ -50,8 +50,8 @@ public class AuthController {
         String token =
                 authService.authenticateUser(request);
 
-        AuthResponse.AuthData data =
-                new AuthResponse.AuthData();
+        AuthResponseData data =
+                new AuthResponseData();
 
         data.setToken(token);
 
