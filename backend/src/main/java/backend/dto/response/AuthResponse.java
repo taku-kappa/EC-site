@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthResponse {
     private boolean success;
-    private AuthData data;
+    private AuthResponseData data;
 
-    // レスポンスのJSON構造（"data": { ... }）に合わせるための内部クラス
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class AuthData {
-        private Long userId;
-        private String token;
-    }
+//    // レスポンスのJSON構造（"data": { ... }）に合わせるための内部クラス
+//    @Data
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class AuthData {
+//        private Long userId;
+//        private String token;
+//    }
 }

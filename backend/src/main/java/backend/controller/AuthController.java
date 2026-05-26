@@ -3,6 +3,7 @@ package backend.controller;
 import backend.dto.request.LoginRequest;
 import backend.dto.request.RegisterRequest;
 import backend.dto.response.AuthResponse;
+import backend.dto.response.AuthResponseData;
 import backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class AuthController {
     ) {
         Long userId = authService.registerUser(request);
 
-        AuthResponse.AuthData data =
-                new AuthResponse.AuthData();
+        AuthResponseData data =
+                new AuthResponseData();
 
         data.setUserId(userId);
 
