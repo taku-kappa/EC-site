@@ -69,13 +69,19 @@ public class AuthService {
      * @param request ログインリクエスト
      * @return JWTトークン
      */
-    public String authenticateUser(
-            LoginRequest request
-    ) {
+    public String authenticateUser(LoginRequest request) {
 
         // 認証実行
         Authentication authentication =
                 authenticationManager.authenticate(
+                        /**
+                         * ーー 内部処理が含まれるため説明 ーー
+                         * authenticationManager ➡︎ ProviderManager ➡︎
+                         * DaoAuthenticationProvider ➡︎ UserDetailsServiceImplの順で処理が呼ばれる
+                         * ① UserDetailsServiceImplのloadUserByUsernameメソッドでDBからユーザー情報を取得
+                         * ② PasswordEncoder.matchesによりパスワード一致の検証(DaoAuthenticationProviderで呼び出し)
+                         * ①,②の情報をProvider ➡︎ Managerへ渡す
+                         */
                         new UsernamePasswordAuthenticationToken(
                                 request.getEmail(),
                                 request.getPassword()

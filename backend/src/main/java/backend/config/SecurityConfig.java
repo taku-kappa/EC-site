@@ -29,14 +29,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    /**
-     * JWT認証フィルター
-     */
+    // JWT認証フィルター
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    /**
-     * 認証エントリポイント
-     */
+    // 認証エントリポイント
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     /**
