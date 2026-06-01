@@ -2,9 +2,8 @@ package backend.dto.response;
 
 import lombok.Data;
 
-// 商品一覧レスポンスDTO
 @Data
-public class ProductResponse {
+public class ProductDetailResponse {
 
     // 商品ID
     private Long id;
@@ -20,6 +19,9 @@ public class ProductResponse {
 
     // カテゴリID
     private Long categoryId;
+
+    // カテゴリ名
+    private String categoryName;
 
     // 在庫数
     private Integer stockQuantity;
