@@ -1,27 +1,24 @@
 package backend.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+/**
+ * カテゴリテーブル Entity
+ */
+@Data
 public class Category {
 
+    // カテゴリID
     private Long id;
 
+    // カテゴリ名
     private String name;
 
+    // 作成日時
     private LocalDateTime createdAt;
 
+    // 更新日時
     private LocalDateTime updatedAt;
-
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
