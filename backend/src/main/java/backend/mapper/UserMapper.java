@@ -3,6 +3,7 @@ package backend.mapper;
 import backend.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.mybatis.spring.annotation.MapperScan;
 
 /**
  * ユーザー Mapper

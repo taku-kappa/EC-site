@@ -47,13 +47,8 @@ public class AuthController {
     public ResponseEntity<AuthResponse> authenticateUser(
             @Valid @RequestBody LoginRequest request
     ) {
-        String token =
-                authService.authenticateUser(request);
-
         AuthResponseData data =
-                new AuthResponseData();
-
-        data.setToken(token);
+                authService.authenticateUser(request);
 
         AuthResponse response =
                 new AuthResponse(true, data);
