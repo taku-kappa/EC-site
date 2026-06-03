@@ -5,9 +5,7 @@
 
 <mapper namespace="backend.mapper.CategoryMapper">
 
-    <!--
-        カテゴリ一覧取得
-    -->
+    <!-- カテゴリ一覧取得 -->
     <select id="findAll" resultType="backend.entity.Category">
         SELECT
         id,

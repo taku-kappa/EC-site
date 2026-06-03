@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * 商品新規登録リクエストDTO
+ * 商品更新リクエストDTO
  */
 @Data
-public class ProductCreateRequest {
+public class ProductUpdateRequest {
 
     // カテゴリID
     @NotNull(message = "カテゴリIDは必須です")
@@ -30,8 +30,7 @@ public class ProductCreateRequest {
     // 商品画像URL
     private String imageUrl;
 
-    // 在庫数
-    @NotNull(message = "在庫数は必須です")
-    @Min(value = 0, message = "在庫数は0以上で入力してください")
-    private Integer stockQuantity;
+    // 楽観ロック用Version
+    @NotNull(message = "versionは必須です")
+    private Integer version;
 }

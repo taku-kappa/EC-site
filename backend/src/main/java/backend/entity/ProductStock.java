@@ -10,7 +10,7 @@ public class ProductStock {
 
     private Long id;
 
-    private Product product;
+    private Long productId;
 
     private Integer stockQuantity = 0;
 

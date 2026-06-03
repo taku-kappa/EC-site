@@ -4,7 +4,7 @@ import lombok.Data;
 
 // 商品一覧レスポンスDTO
 @Data
-public class ProductResponse {
+public class ProductListResponse {
 
     // 商品ID
     private Long id;
@@ -14,6 +14,10 @@ public class ProductResponse {
 
     // 商品説明
     private String description;
+
+    // 商品価格
+    private Integer price;
+
 
     // 商品画像URL
     private String imageUrl;

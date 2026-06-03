@@ -11,7 +11,7 @@ public class Product {
 
     private Long id;
 
-    private Category category;
+    private Long categoryId;
 
     private String name;
 
@@ -24,8 +24,6 @@ public class Product {
     private Integer version = 0; // 商品情報の楽観ロック（必要に応じて使用）
 
     private Boolean deleted = false; // 論理削除フラグ
-
-    private ProductStock productStock;
 
     private LocalDateTime createdAt;
 

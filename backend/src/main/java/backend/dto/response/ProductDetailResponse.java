@@ -14,8 +14,14 @@ public class ProductDetailResponse {
     // 商品説明
     private String description;
 
+    // 商品価格
+    private Integer price;
+
     // 商品画像URL
     private String imageUrl;
+
+    // 楽観ロック用Version
+    private Integer version;
 
     // カテゴリID
     private Long categoryId;
