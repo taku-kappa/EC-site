@@ -4,6 +4,7 @@ import backend.dto.request.ProductCreateRequest;
 import backend.dto.request.ProductUpdateRequest;
 import backend.dto.response.ApiResponse;
 import backend.dto.response.ProductCreateResponse;
+import backend.dto.response.ProductDeleteResponse;
 import backend.dto.response.ProductDetailResponse;
 import backend.dto.response.ProductListResponse;
 import backend.dto.response.ProductUpdateResponse;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -98,6 +100,25 @@ public class ProductController {
 
         ProductUpdateResponse response =
                 productService.updateProduct(id, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(response)
+        );
+    }
+
+    /**
+     * 商品削除
+     *
+     * @param id 商品ID
+     * @return 削除結果
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductDeleteResponse>>
+    deleteProduct(
+            @PathVariable Long id) {
+
+        ProductDeleteResponse response =
+                productService.deleteProduct(id);
 
         return ResponseEntity.ok(
                 ApiResponse.success(response)

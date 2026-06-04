@@ -55,4 +55,12 @@ public interface ProductMapper {
      * @return 更新件数
      */
     int update(Product product);
+
+    /**
+     * 商品論理削除
+     *
+     * @param id 商品ID
+     * @return 更新件数
+     */
+    int deleteById(Long id);
 }

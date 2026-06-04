@@ -3,6 +3,7 @@ package backend.service;
 import backend.dto.request.ProductCreateRequest;
 import backend.dto.request.ProductUpdateRequest;
 import backend.dto.response.ProductCreateResponse;
+import backend.dto.response.ProductDeleteResponse;
 import backend.dto.response.ProductDetailResponse;
 import backend.dto.response.ProductListResponse;
 import backend.dto.response.ProductUpdateResponse;
@@ -135,6 +136,35 @@ public class ProductService {
         return new ProductUpdateResponse(
                 id,
                 "商品情報を更新しました"
+        );
+    }
+
+    /**
+     * 商品削除
+     *
+     * 論理削除を実施する
+     *
+     * @param id 商品ID
+     * @return 削除結果
+     */
+    @Transactional
+    public ProductDeleteResponse deleteProduct(Long id) {
+
+        Product product = productMapper.findById(id);
+
+        if (product == null) {
+            throw new RuntimeException("商品が存在しません");
+        }
+
+        int deleteCount = productMapper.deleteById(id);
+
+        if (deleteCount == 0) {
+            throw new RuntimeException("商品削除に失敗しました");
+        }
+
+        return new ProductDeleteResponse(
+                id,
+                "商品を削除しました"
         );
     }
 }

@@ -132,4 +132,17 @@
 
     </update>
 
+    <!-- 商品論理削除 -->
+    <update id="deleteById"
+            parameterType="long">
+
+        UPDATE products
+        SET
+        deleted = TRUE,
+        updated_at = NOW()
+        WHERE id = #{id}
+        AND deleted = FALSE
+
+    </update>
+
 </mapper>
