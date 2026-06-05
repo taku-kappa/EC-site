@@ -14,7 +14,7 @@ public class ProductStock {
 
     private Integer stockQuantity = 0;
 
-    private Integer version;
+    private Integer version = 0;
 
     private LocalDateTime createdAt;
 

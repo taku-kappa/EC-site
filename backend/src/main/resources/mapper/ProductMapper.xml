@@ -47,7 +47,8 @@
         p.version,
         c.id AS categoryId,
         c.name AS categoryName,
-        ps.stock_quantity AS stockQuantity
+        ps.stock_quantity AS stockQuantity,
+        ps.stock_version AS stockVersion
         FROM products p
         INNER JOIN categories c
         ON p.category_id = c.id

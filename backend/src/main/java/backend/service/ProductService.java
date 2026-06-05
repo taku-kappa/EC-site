@@ -1,11 +1,13 @@
 package backend.service;
 
 import backend.dto.request.ProductCreateRequest;
+import backend.dto.request.ProductStockUpdateRequest;
 import backend.dto.request.ProductUpdateRequest;
 import backend.dto.response.ProductCreateResponse;
 import backend.dto.response.ProductDeleteResponse;
 import backend.dto.response.ProductDetailResponse;
 import backend.dto.response.ProductListResponse;
+import backend.dto.response.ProductStockUpdateResponse;
 import backend.dto.response.ProductUpdateResponse;
 import backend.entity.Product;
 import backend.entity.ProductStock;
@@ -165,6 +167,54 @@ public class ProductService {
         return new ProductDeleteResponse(
                 id,
                 "商品を削除しました"
+        );
+    }
+
+    /**
+     * 商品在庫更新
+     *
+     * product_stocks.version を利用して
+     * 楽観ロック更新を行う
+     *
+     * @param productId 商品ID
+     * @param request 更新情報
+     * @return 更新結果
+     */
+    @Transactional
+    public ProductStockUpdateResponse updateProductStock(
+            Long productId,
+            ProductStockUpdateRequest request) {
+
+        ProductStock stock =
+                productStockMapper.findByProductId(productId);
+
+        if (stock == null) {
+            throw new RuntimeException(
+                    "商品在庫が存在しません"
+            );
+        }
+
+        stock.setStockQuantity(
+                request.getStockQuantity()
+        );
+
+        stock.setVersion(
+                request.getVersion()
+        );
+
+        int updateCount =
+                productStockMapper.update(stock);
+
+        if (updateCount == 0) {
+            throw new RuntimeException(
+                    "他ユーザーによって更新されています。再取得してください。"
+            );
+        }
+
+        return new ProductStockUpdateResponse(
+                productId,
+                request.getStockQuantity(),
+                "商品在庫を更新しました"
         );
     }
 }

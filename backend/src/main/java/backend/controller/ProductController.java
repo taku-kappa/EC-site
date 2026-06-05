@@ -1,12 +1,14 @@
 package backend.controller;
 
 import backend.dto.request.ProductCreateRequest;
+import backend.dto.request.ProductStockUpdateRequest;
 import backend.dto.request.ProductUpdateRequest;
 import backend.dto.response.ApiResponse;
 import backend.dto.response.ProductCreateResponse;
 import backend.dto.response.ProductDeleteResponse;
 import backend.dto.response.ProductDetailResponse;
 import backend.dto.response.ProductListResponse;
+import backend.dto.response.ProductStockUpdateResponse;
 import backend.dto.response.ProductUpdateResponse;
 import backend.service.ProductService;
 import jakarta.validation.Valid;
@@ -119,6 +121,31 @@ public class ProductController {
 
         ProductDeleteResponse response =
                 productService.deleteProduct(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(response)
+        );
+    }
+
+    /**
+     * 商品在庫更新
+     *
+     * @param id 商品ID
+     * @param request 更新情報
+     * @return 更新結果
+     */
+    @PutMapping("/{id}/stock")
+    public ResponseEntity<ApiResponse<ProductStockUpdateResponse>>
+    updateProductStock(
+            @PathVariable Long id,
+            @Valid
+            @RequestBody ProductStockUpdateRequest request) {
+
+        ProductStockUpdateResponse response =
+                productService.updateProductStock(
+                        id,
+                        request
+                );
 
         return ResponseEntity.ok(
                 ApiResponse.success(response)

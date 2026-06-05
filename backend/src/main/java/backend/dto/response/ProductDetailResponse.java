@@ -21,7 +21,7 @@ public class ProductDetailResponse {
     private String imageUrl;
 
     // 楽観ロック用Version
-    private Integer version;
+    private Integer stockVersion;
 
     // カテゴリID
     private Long categoryId;

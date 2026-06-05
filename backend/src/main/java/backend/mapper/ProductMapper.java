@@ -2,6 +2,7 @@ package backend.mapper;
 
 import backend.dto.response.ProductDetailResponse;
 import backend.dto.response.ProductListResponse;
+import backend.entity.ProductStock;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import backend.entity.Product;
@@ -63,4 +64,5 @@ public interface ProductMapper {
      * @return 更新件数
      */
     int deleteById(Long id);
+
 }
