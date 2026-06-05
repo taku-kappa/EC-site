@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backend.mapper.CartItemMapper">
+
+    <!-- カート内商品一覧取得 -->
+    <select id="findCartItems"
+            resultType="backend.dto.response.CartItemResponse">
+
+        SELECT
+        ci.id AS cartItemId,
+        p.id AS productId,
+        p.name AS productName,
+        p.price,
+        ci.quantity,
+        p.image_url AS imageUrl
+        FROM cart_items ci
+        INNER JOIN products p
+        ON ci.product_id = p.id
+        WHERE ci.cart_id = #{cartId}
+        AND p.deleted = false
+        ORDER BY ci.id
+
+    </select>
+
+</mapper>
