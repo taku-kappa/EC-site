@@ -19,4 +19,25 @@
 
     </select>
 
+    <!-- カート新規作成 -->
+    <insert id="insert"
+            parameterType="backend.entity.Cart"
+            useGeneratedKeys="true"
+            keyProperty="id">
+
+        INSERT INTO carts
+        (
+        user_id,
+        created_at,
+        updated_at
+        )
+        VALUES
+        (
+        #{userId},
+        NOW(),
+        NOW()
+        )
+
+    </insert>
+
 </mapper>

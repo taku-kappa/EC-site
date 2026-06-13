@@ -25,4 +25,83 @@
 
     </select>
 
+    <!-- カート商品取得 -->
+    <select id="findByCartIdAndProductId"
+            resultType="backend.entity.CartItem">
+
+        SELECT
+        id,
+        cart_id,
+        product_id,
+        quantity,
+        created_at,
+        updated_at
+        FROM cart_items
+        WHERE cart_id = #{cartId}
+        AND product_id = #{productId}
+
+    </select>
+
+    <!-- カート商品追加 -->
+    <insert id="insert"
+            parameterType="backend.entity.CartItem"
+            useGeneratedKeys="true"
+            keyProperty="id">
+
+        INSERT INTO cart_items
+        (
+        cart_id,
+        product_id,
+        quantity,
+        created_at,
+        updated_at
+        )
+        VALUES
+        (
+        #{cartId},
+        #{productId},
+        #{quantity},
+        NOW(),
+        NOW()
+        )
+
+    </insert>
+
+    <!-- 数量更新 -->
+    <update id="updateQuantity"
+            parameterType="backend.entity.CartItem">
+
+        UPDATE cart_items
+        SET
+        quantity = #{quantity},
+        updated_at = NOW()
+        WHERE id = #{id}
+
+    </update>
+
+    <!-- カート商品IDからカート商品を取得 -->
+    <select id="findById"
+            resultType="backend.entity.CartItem">
+
+        SELECT
+        id,
+        cart_id,
+        product_id,
+        quantity,
+        created_at,
+        updated_at
+        FROM cart_items
+        WHERE id = #{id}
+
+    </select>
+
+    <!-- カート商品を削除 -->
+    <delete id="deleteById">
+
+        DELETE
+        FROM cart_items
+        WHERE id = #{id}
+
+    </delete>
+
 </mapper>

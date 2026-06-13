@@ -15,4 +15,10 @@ public interface CartMapper {
      */
     Cart findByUserId(Long userId);
 
+    /**
+     * カートを新規作成
+     *
+     * @param cart カート情報
+     */
+    void insert(Cart cart);
 }
