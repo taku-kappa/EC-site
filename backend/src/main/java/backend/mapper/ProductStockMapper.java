@@ -32,4 +32,15 @@ public interface ProductStockMapper {
      * @return 更新件数
      */
     int update(ProductStock productStock);
+
+    /**
+     * 商品在庫取得（悲観ロック）
+     *
+     * 注文確定時に他トランザクションからの更新を防ぐため、
+     * SELECT ... FOR UPDATE を使用して取得します。
+     *
+     * @param productId 商品ID
+     * @return 商品在庫
+     */
+    ProductStock findByProductIdForUpdate(Long productId);
 }

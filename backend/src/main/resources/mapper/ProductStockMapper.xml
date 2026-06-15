@@ -58,4 +58,22 @@
 
     </update>
 
+    <!-- 商品在庫取得（悲観ロック）-->
+    <select id="findByProductIdForUpdate"
+            parameterType="long"
+            resultType="backend.entity.ProductStock">
+
+        SELECT
+        id,
+        product_id AS productId,
+        stock_quantity AS stockQuantity,
+        version,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM product_stocks
+        WHERE product_id = #{productId}
+        FOR UPDATE
+
+    </select>
+
 </mapper>
