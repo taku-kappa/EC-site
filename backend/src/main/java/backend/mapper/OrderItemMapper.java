@@ -1,5 +1,6 @@
 package backend.mapper;
 
+import backend.dto.response.OrderItemResponse;
 import backend.entity.OrderItem;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -24,4 +25,11 @@ public interface OrderItemMapper {
      */
     List<OrderItem> findByOrderId(Long orderId);
 
+    /**
+     * 注文商品の取得
+     *
+     * @param orderId 注文ID
+     * @return 注文商品一覧
+     */
+    List<OrderItemResponse> findOrderItems(Long orderId);
 }

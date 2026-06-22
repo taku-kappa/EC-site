@@ -49,4 +49,19 @@
 
     </select>
 
+    <!-- 注文履歴一覧取得 -->
+    <select id="findOrderHistory"
+            resultType="backend.dto.response.OrderHistoryResponse">
+
+        SELECT
+        id AS orderId,
+        total_price AS totalPrice,
+        status,
+        ordered_at AS orderedAt
+        FROM orders
+        WHERE user_id = #{userId}
+        ORDER BY ordered_at DESC
+
+    </select>
+
 </mapper>

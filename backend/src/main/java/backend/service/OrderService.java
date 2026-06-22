@@ -1,5 +1,8 @@
 package backend.service;
 
+import backend.dto.response.OrderHistoryDetailResponse;
+import backend.dto.response.OrderHistoryResponse;
+import backend.dto.response.OrderItemResponse;
 import backend.dto.response.OrderResponse;
 import backend.entity.Cart;
 import backend.entity.CartItem;
@@ -166,6 +169,68 @@ public class OrderService {
         response.setOrderId(order.getId());
         response.setTotalPrice(totalPrice);
         response.setStatus(order.getStatus());
+
+        return response;
+    }
+
+    /**
+     * ログインユーザーの注文履歴一覧を取得します。
+     *
+     * @param userId ユーザーID
+     * @return 注文履歴一覧
+     */
+    public List<OrderHistoryResponse> getOrderHistory(
+            Long userId) {
+
+        return orderMapper.findOrderHistory(userId);
+    }
+
+    /**
+     * 注文履歴詳細を取得します。
+     *
+     * 指定された注文がログインユーザー自身の注文であることを確認した上で、
+     * 注文情報と注文明細を返却します。
+     *
+     * @param userId ユーザーID
+     * @param orderId 注文ID
+     * @return 注文詳細
+     */
+    public OrderHistoryDetailResponse getOrderDetail(
+            Long userId,
+            Long orderId) {
+
+        // 注文取得
+        Order order = orderMapper.findById(orderId);
+
+        if (order == null) {
+            throw new RuntimeException("注文が存在しません。");
+        }
+
+        // 他ユーザーの注文参照防止
+        if (!order.getUserId().equals(userId)) {
+            throw new RuntimeException("参照権限がありません。");
+        }
+
+        // 注文商品取得
+        List<OrderItemResponse> items =
+                orderItemMapper.findOrderItems(orderId);
+
+        // 小計計算
+        items.forEach(item ->
+                item.setSubtotal(
+                        item.getPrice() * item.getQuantity()
+                )
+        );
+
+        // レスポンス生成
+        OrderHistoryDetailResponse response =
+                new OrderHistoryDetailResponse();
+
+        response.setOrderId(order.getId());
+        response.setTotalPrice(order.getTotalPrice());
+        response.setStatus(order.getStatus());
+        response.setOrderedAt(order.getOrderedAt());
+        response.setItems(items);
 
         return response;
     }
