@@ -49,10 +49,25 @@ public interface CartItemMapper {
     CartItem findById(Long id);
 
     /**
-     * カート商品を削除します。
+     * カート商品削除
      *
      * @param id カート商品ID
      */
     void deleteById(Long id);
+
+    /**
+     * カートIDからカート一覧商品取得
+     *
+     * @param cartId カートID
+     * @return カート商品一覧
+     */
+    List<CartItem> findByCartId(Long cartId);
+
+    /**
+     * カート内商品をすべて削除
+     *
+     * @param cartId カートID
+     */
+    void deleteByCartId(Long cartId);
 
 }

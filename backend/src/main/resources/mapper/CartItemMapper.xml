@@ -104,4 +104,30 @@
 
     </delete>
 
+    <!-- カートIDからカート商品一覧取得 -->
+    <select id="findByCartId"
+            resultType="backend.entity.CartItem">
+
+        SELECT
+        id,
+        cart_id AS cartId,
+        product_id AS productId,
+        quantity,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM cart_items
+        WHERE cart_id = #{cartId}
+        ORDER BY product_id ASC
+
+    </select>
+
+    <!-- カート内商品をすべて削除 -->
+    <delete id="deleteByCartId">
+
+        DELETE
+        FROM cart_items
+        WHERE cart_id = #{cartId}
+
+    </delete>
+
 </mapper>

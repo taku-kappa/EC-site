@@ -2,34 +2,35 @@ package backend.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class OrderItem {
 
+    // 注文明細ID
     private Long id;
 
-    private Order order;
+    // 注文ID
+    private Long orderId;
 
-    private Product product;
+    // 商品ID
+    private Long productId;
 
-    private String productName; // 購入時の商品名（マスター変更対策）
+    // 注文時点の商品名（スナップショット）
+    private String productName;
 
-    private Integer price; // 購入時の価格（価格改定対策）
+    // 注文時点の商品価格（スナップショット）
+    private Integer price;
 
+    // 注文数量
     private Integer quantity;
 
+    // 作成日時
     private LocalDateTime createdAt;
 
+    // 更新日時
     private LocalDateTime updatedAt;
 
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
