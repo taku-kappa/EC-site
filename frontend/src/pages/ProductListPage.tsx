@@ -14,15 +14,7 @@ function ProductListPage() {
      */
     const [products, setProducts] = useState<Product[]>([]);
 
-    /**
-     * 初回表示時
-     */
-    useEffect(() => {
-
-        loadProducts();
-
-    }, []);
-
+    
     /**
      * 商品一覧取得
      */
@@ -43,6 +35,15 @@ function ProductListPage() {
         }
 
     };
+
+    /**
+     * 初回表示時
+     */
+    useEffect(() => {
+
+        loadProducts();
+
+    }, []);
 
     return (
 
