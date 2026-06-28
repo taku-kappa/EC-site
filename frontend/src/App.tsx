@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
+import ProductListPage from "./pages/ProductListPage";
 
 function App() {
 
@@ -21,6 +22,11 @@ function App() {
                 <Route
                     path="/login"
                     element={<LoginPage />}
+                />
+
+                <Route
+                    path="/products"
+                    element={<ProductListPage />}
                 />
 
             </Routes>

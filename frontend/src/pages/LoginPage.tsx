@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { login } from "../api/userApi";
+import { useNavigate } from "react-router-dom";
 
 /**
  * ログイン画面
@@ -14,6 +15,9 @@ function LoginPage() {
 
     // エラーメッセージ
     const [errorMessage, setErrorMessage] = useState("");
+
+    // 画面遷移用のオブジェクト
+    const navigate = useNavigate();
 
     /**
      * ログイン処理
@@ -35,7 +39,7 @@ function LoginPage() {
                 response.token
             );
 
-            alert("ログイン成功");
+            navigate("/products");
 
         } catch {
 
