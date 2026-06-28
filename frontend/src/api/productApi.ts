@@ -8,12 +8,20 @@ const API_BASE_URL = "http://localhost:8081/api";
 
 /**
  * 商品一覧取得
+ *
+ * @returns 商品一覧
  */
 export const getProducts = async (): Promise<Product[]> => {
 
+    /**
+     * JWT取得
+     */
     const token = localStorage.getItem("token");
 
-    const response = await axios.get(
+    /**
+     * 商品一覧取得API呼び出し
+     */
+    const response = await axios.get<Product[]>(
         `${API_BASE_URL}/products`,
         {
             headers: {
@@ -22,8 +30,9 @@ export const getProducts = async (): Promise<Product[]> => {
         }
     );
 
-    // バックエンドのレスポンスで"data"配列の中に
-    // 商品情報を格納して返しているためresponse.data.dataになっている。
-    return response.data.data;
+    /**
+     * 商品一覧を返却
+     */
+    return response.data;
 
 };
