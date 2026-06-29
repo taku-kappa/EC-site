@@ -16,6 +16,7 @@ export const login = async (
     request: LoginRequest
 ): Promise<LoginResponse> => {
 
+    // axios.post<型>（ジェネリクスをしてすることでpostのレスポンスの型を指定できる）
     const response = await axios.post<LoginResponse>(
         `${API_BASE_URL}/api/auth/login`,
         request

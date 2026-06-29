@@ -24,6 +24,7 @@ export const getProducts = async (): Promise<Product[]> => {
     const response = await axios.get<Product[]>(
         `${API_BASE_URL}/products`,
         {
+            // HTTPリクエストのヘッダーにJWTを設定
             headers: {
                 Authorization: `Bearer ${token}`
             }
