@@ -7,6 +7,7 @@ import {
 
 import LoginPage from "./pages/LoginPage";
 import ProductListPage from "./pages/ProductListPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 function App() {
 
@@ -27,6 +28,11 @@ function App() {
                 <Route
                     path="/products"
                     element={<ProductListPage />}
+                />
+
+                <Route
+                    path="/products/:id"
+                    element={<ProductDetailPage />}
                 />
 
             </Routes>

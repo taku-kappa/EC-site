@@ -21,6 +21,9 @@ export interface Product {
     // カテゴリID
     categoryId: number;
 
+    // カテゴリ名
+    categoryName: string;
+
     // 在庫数
     stockQuantity: number;
 

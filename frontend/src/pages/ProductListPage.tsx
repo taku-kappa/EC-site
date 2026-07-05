@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import { getProducts } from "../api/productApi";
 
 import type { Product } from "../types/product";
@@ -10,11 +12,15 @@ import type { Product } from "../types/product";
 function ProductListPage() {
 
     /**
+     * 画面遷移
+     */
+    const navigate = useNavigate();
+
+    /**
      * 商品一覧
      */
     const [products, setProducts] = useState<Product[]>([]);
 
-    
     /**
      * 商品一覧取得
      */
@@ -52,11 +58,16 @@ function ProductListPage() {
             <h1>商品一覧</h1>
 
             {
+
                 products.map((product) => (
 
                     <div
                         key={product.id}
+                        onClick={() =>
+                            navigate(`/products/${product.id}`)
+                        }
                         style={{
+                            cursor: "pointer",
                             border: "1px solid gray",
                             padding: "10px",
                             marginBottom: "10px"
@@ -68,6 +79,7 @@ function ProductListPage() {
                         <p>価格：{product.price}円</p>
 
                         {
+
                             product.imageUrl && (
 
                                 <img
@@ -77,11 +89,13 @@ function ProductListPage() {
                                 />
 
                             )
+
                         }
 
                     </div>
 
                 ))
+
             }
 
         </div>

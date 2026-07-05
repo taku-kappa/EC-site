@@ -15,6 +15,19 @@ export interface LoginRequest {
  */
 export interface LoginResponse {
 
+    // ユーザーID
+    userId: number;
+
     // JWTトークン
     token: string;
+}
+
+/**
+ * APIレスポンス
+ */
+export interface LoginApiResponse {
+
+    success: boolean;
+
+    data: LoginResponse;
 }
