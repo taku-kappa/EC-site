@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { getProductById } from "../api/productApi";
 
 import type { Product } from "../types/product";
 
 import { addCart } from "../api/cartApi";
+
+
 
 /**
  * 商品詳細画面
@@ -27,6 +29,11 @@ function ProductDetailPage() {
      * 購入数量
      */
     const [quantity, setQuantity] = useState(1);
+
+    /**
+     * 画面遷移用
+     */
+    const navigate = useNavigate();
 
     /**
      * 商品取得
@@ -162,13 +169,18 @@ function ProductDetailPage() {
             <br />
 
             <button
-
                 onClick={handleAddCart}
-
             >
-
                 カートへ追加
+            </button>
 
+            <br />
+            <br />
+
+            <button
+                onClick={() => navigate("/cart")}
+            >
+                カートを見る
             </button>
 
         </div>

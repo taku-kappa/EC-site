@@ -22,12 +22,12 @@ export interface LoginResponse {
     token: string;
 }
 
-/**
- * APIレスポンス
- */
-export interface LoginApiResponse {
+// /**
+//  * APIレスポンス
+//  */
+// export interface LoginApiResponse {
 
-    success: boolean;
+//     success: boolean;
 
-    data: LoginResponse;
-}
+//     data: LoginResponse;
+// }

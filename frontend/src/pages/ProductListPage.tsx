@@ -24,23 +24,47 @@ function ProductListPage() {
     /**
      * 商品一覧取得
      */
-    const loadProducts = async () => {
+    // const loadProducts = async () => {
 
-        try {
+    //     try {
 
-            const response = await getProducts();
+    //         const response = await getProducts();
 
-            setProducts(response);
+    //         setProducts(response);
 
-        } catch (error) {
+    //     } catch (error) {
 
-            console.error(error);
+    //         console.error(error);
 
-            alert("商品一覧の取得に失敗しました。");
+    //         alert("商品一覧の取得に失敗しました。");
 
-        }
+    //     }
 
-    };
+    // };
+
+const loadProducts = async () => {
+
+    try {
+
+        const response = await getProducts();
+
+        console.log("商品一覧レスポンス:", response);
+        console.log("配列か？", Array.isArray(response));
+
+        setProducts(response);
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("商品一覧の取得に失敗しました。");
+
+    }
+
+};
+
+
+
 
     /**
      * 初回表示時

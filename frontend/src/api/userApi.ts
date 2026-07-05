@@ -3,8 +3,9 @@ import axios from "axios";
 import type {
     LoginRequest,
     LoginResponse,
-    LoginApiResponse
 } from "../types/auth";
+
+import type { ApiResponse } from "../types/ApiResponse";
 
 /**
  * APIベースURL
@@ -21,7 +22,7 @@ export const login = async (
     request: LoginRequest
 ): Promise<LoginResponse> => {
 
-    const response = await axios.post<LoginApiResponse>(
+    const response = await axios.post<ApiResponse<LoginResponse>>(
         `${API_BASE_URL}/api/auth/login`,
         request
     );

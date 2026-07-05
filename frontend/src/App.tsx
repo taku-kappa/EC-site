@@ -8,6 +8,7 @@ import {
 import LoginPage from "./pages/LoginPage";
 import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import CartPage from "./pages/CartPage";
 
 function App() {
 
@@ -33,6 +34,11 @@ function App() {
                 <Route
                     path="/products/:id"
                     element={<ProductDetailPage />}
+                />
+
+                <Route
+                    path="/cart"
+                    element={<CartPage />}
                 />
 
             </Routes>
