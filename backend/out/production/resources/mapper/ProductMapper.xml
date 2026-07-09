@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backend.mapper.ProductMapper">
+
+    <!--
+        商品一覧取得
+        categoryIdが指定された場合はカテゴリ絞り込みを行う
+    -->
+    <select id="findProducts"
+            resultType="backend.dto.response.ProductListResponse">
+
+        SELECT
+        p.id,
+        p.name,
+        p.description,
+        p.price,
+        p.image_url AS imageUrl,
+        p.category_id AS categoryId,
+        ps.stock_quantity AS stockQuantity
+        FROM products p
+        INNER JOIN product_stocks ps
+        ON p.id = ps.product_id
+        WHERE p.deleted = false
+
+        <if test="categoryId != null">
+            AND p.category_id = #{categoryId}
+        </if>
+
+        ORDER BY p.id
+
+    </select>
+
+    <!-- 商品詳細取得 -->
+    <select id="findDetailById"
+            parameterType="long"
+            resultType="backend.dto.response.ProductDetailResponse">
+
+        SELECT
+        p.id,
+        p.name,
+        p.description,
+        p.price,
+        p.image_url AS imageUrl,
+        p.version,
+        c.id AS categoryId,
+        c.name AS categoryName,
+        ps.stock_quantity AS stockQuantity,
+        ps.version AS stockVersion
+        FROM products p
+        INNER JOIN categories c
+        ON p.category_id = c.id
+        INNER JOIN product_stocks ps
+        ON p.id = ps.product_id
+        WHERE p.id = #{id}
+        AND p.deleted = FALSE
+
+    </select>
+
+    <!-- 商品登録 -->
+    <insert id="insert"
+            parameterType="backend.entity.Product"
+            useGeneratedKeys="true"
+            keyProperty="id">
+
+        INSERT INTO products
+        (
+        category_id,
+        name,
+        description,
+        price,
+        image_url,
+        version,
+        deleted,
+        created_at,
+        updated_at
+        )
+        VALUES
+        (
+        #{categoryId},
+        #{name},
+        #{description},
+        #{price},
+        #{imageUrl},
+        0,
+        FALSE,
+        NOW(),
+        NOW()
+        )
+
+    </insert>
+
+    <!-- 商品取得 -->
+    <select id="findById"
+            parameterType="long"
+            resultType="backend.entity.Product">
+
+        SELECT
+        id,
+        category_id AS categoryId,
+        name,
+        description,
+        price,
+        image_url AS imageUrl,
+        version,
+        deleted,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM products
+        WHERE id = #{id}
+        AND deleted = FALSE
+
+    </select>
+
+    <!-- 商品更新 -->
+    <update id="update"
+            parameterType="backend.entity.Product">
+
+        UPDATE products
+        SET
+        category_id = #{categoryId},
+        name = #{name},
+        description = #{description},
+        price = #{price},
+        image_url = #{imageUrl},
+        version = version + 1,
+        updated_at = NOW()
+        WHERE id = #{id}
+        AND version = #{version}
+        AND deleted = FALSE
+
+    </update>
+
+    <!-- 商品論理削除 -->
+    <update id="deleteById"
+            parameterType="long">
+
+        UPDATE products
+        SET
+        deleted = TRUE,
+        updated_at = NOW()
+        WHERE id = #{id}
+        AND deleted = FALSE
+
+    </update>
+
+</mapper>

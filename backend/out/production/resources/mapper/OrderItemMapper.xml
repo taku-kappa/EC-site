@@ -5,7 +5,9 @@
 
 <mapper namespace="backend.mapper.OrderItemMapper">
 
-    <!-- 注文明細登録 -->
+    <!--
+        注文明細登録
+    -->
     <insert id="insert"
             parameterType="backend.entity.OrderItem"
             useGeneratedKeys="true"
@@ -34,22 +36,24 @@
 
     </insert>
 
-    <!-- 注文IDから注文明細取得 -->
-    <select id="findOrderItems"
-            parameterType="long"
-            resultType="backend.dto.response.OrderItemResponse">
+    <!--
+        注文IDから注文明細一覧取得
+    -->
+    <select id="findByOrderId"
+            resultType="backend.entity.OrderItem">
 
         SELECT
-        oi.product_id AS productId,
-        p.name AS productName,
-        oi.price,
-        oi.quantity,
-        (oi.price * oi.quantity) AS subtotal
-        FROM order_items oi
-        INNER JOIN products p
-        ON oi.product_id = p.id
-        WHERE oi.order_id = #{orderId}
-        ORDER BY oi.id
+        id,
+        order_id AS orderId,
+        product_id AS productId,
+        product_name AS productName,
+        price,
+        quantity,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM order_items
+        WHERE order_id = #{orderId}
+        ORDER BY id
 
     </select>
 

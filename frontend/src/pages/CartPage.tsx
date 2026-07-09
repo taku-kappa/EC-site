@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import {
 
     getCart,
-
     updateCartQuantity,
-
     deleteCartItem
-
 } from "../api/cartApi";
 
 import type {
-
     CartItem,
-
     CartResponse
-
 } from "../types/cart";
 
 /**
@@ -32,6 +28,11 @@ function CartPage() {
      * 合計金額
      */
     const [totalPrice, setTotalPrice] = useState(0);
+
+    /**
+     * 画面遷移用
+     */
+    const navigate = useNavigate();
 
     /**
      * カート一覧取得
@@ -222,8 +223,20 @@ function CartPage() {
                         合計金額：{totalPrice}円
                     </h2>
 
-                    <button>
-                        注文確認へ進む
+                    <br />
+
+                    <button
+                        onClick={() => navigate("/products")}
+                    >
+                        買い物を続ける
+                    </button>
+
+                    {" "}
+
+                    <button
+                        onClick={() => navigate("/order-confirm")}
+                    >
+                        注文確認へ
                     </button>
 
                 </>

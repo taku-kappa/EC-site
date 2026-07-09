@@ -1,0 +1,36 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: backend
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/ecsite
+    username: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: backend.entity
+
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    backend.mapper: DEBUG
+
+jwt:
+  secret: mySecretKeyForJwtTokenGeneration12345678901234567890
+  expiration-ms: 86400000
