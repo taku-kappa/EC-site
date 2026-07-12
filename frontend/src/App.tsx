@@ -9,6 +9,9 @@ import LoginPage from "./pages/LoginPage";
 import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
+import OrderConfirmPage from "./pages/OrderConfirmPage";
+import OrderHistoryPage from "./pages/OrderHistoryPage";
+import OrderDetailPage from "./pages/OrderDetailPage";
 
 function App() {
 
@@ -42,12 +45,17 @@ function App() {
                 />
 
                 <Route
-                    path="/order"
+                    path="/order-confirm"
+                    element={<OrderConfirmPage />}
+                />
+
+                <Route
+                    path="/orders"
                     element={<OrderHistoryPage />}
                 />
 
                 <Route
-                    path="/order/:id"
+                    path="/orders/:id"
                     element={<OrderDetailPage />}
                 />
 
