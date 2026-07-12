@@ -41,6 +41,16 @@ function App() {
                     element={<CartPage />}
                 />
 
+                <Route
+                    path="/order"
+                    element={<OrderHistoryPage />}
+                />
+
+                <Route
+                    path="/order/:id"
+                    element={<OrderDetailPage />}
+                />
+
             </Routes>
         </BrowserRouter>
     );
