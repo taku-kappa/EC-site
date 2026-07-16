@@ -9,6 +9,8 @@ import backend.dto.response.ProductDetailResponse;
 import backend.dto.response.ProductListResponse;
 import backend.dto.response.ProductStockUpdateResponse;
 import backend.dto.response.ProductUpdateResponse;
+import backend.exception.BusinessException;
+import backend.exception.ResourceNotFoundException;
 import backend.entity.Product;
 import backend.entity.ProductStock;
 import backend.mapper.ProductMapper;
@@ -52,7 +54,7 @@ public class ProductService {
                 productMapper.findDetailById(id);
 
         if (product == null) {
-            throw new RuntimeException("商品が存在しません");
+            throw new ResourceNotFoundException("商品が存在しません");
         }
 
         return product;
@@ -115,7 +117,7 @@ public class ProductService {
         Product product = productMapper.findById(id);
 
         if (product == null) {
-            throw new RuntimeException("商品が存在しません");
+            throw new ResourceNotFoundException("商品が存在しません");
         }
 
         product.setCategoryId(request.getCategoryId());
@@ -130,8 +132,8 @@ public class ProductService {
         int updateCount = productMapper.update(product);
 
         if (updateCount == 0) {
-            throw new RuntimeException(
-                    "他ユーザーによって更新されています。再取得してください。"
+            throw new BusinessException(
+                    "商品情報の更新に失敗しました。再度お試しください。"
             );
         }
 
@@ -155,13 +157,13 @@ public class ProductService {
         Product product = productMapper.findById(id);
 
         if (product == null) {
-            throw new RuntimeException("商品が存在しません");
+            throw new ResourceNotFoundException("商品が存在しません");
         }
 
         int deleteCount = productMapper.deleteById(id);
 
         if (deleteCount == 0) {
-            throw new RuntimeException("商品削除に失敗しました");
+            throw new BusinessException("商品削除に失敗しました");
         }
 
         return new ProductDeleteResponse(
@@ -189,7 +191,7 @@ public class ProductService {
                 productStockMapper.findByProductId(productId);
 
         if (stock == null) {
-            throw new RuntimeException(
+            throw new ResourceNotFoundException(
                     "商品在庫が存在しません"
             );
         }
@@ -206,8 +208,8 @@ public class ProductService {
                 productStockMapper.update(stock);
 
         if (updateCount == 0) {
-            throw new RuntimeException(
-                    "他ユーザーによって更新されています。再取得してください。"
+            throw new BusinessException(
+                    "商品在庫の更新に失敗しました。再度お試しください。"
             );
         }
 

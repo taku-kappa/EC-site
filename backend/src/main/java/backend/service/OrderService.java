@@ -10,6 +10,8 @@ import backend.entity.Order;
 import backend.entity.OrderItem;
 import backend.entity.Product;
 import backend.entity.ProductStock;
+import backend.exception.BusinessException;
+import backend.exception.ResourceNotFoundException;
 import backend.mapper.CartItemMapper;
 import backend.mapper.CartMapper;
 import backend.mapper.OrderItemMapper;
@@ -55,7 +57,7 @@ public class OrderService {
         Cart cart = cartMapper.findByUserId(userId);
 
         if (cart == null) {
-            throw new RuntimeException("カートが存在しません。");
+            throw new ResourceNotFoundException("カートが存在しません。");
         }
 
         // カート内商品取得（product_id昇順）
@@ -63,7 +65,7 @@ public class OrderService {
                 cartItemMapper.findByCartId(cart.getId());
 
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("カート内に商品が存在しません。");
+            throw new BusinessException("カート内に商品が存在しません。");
         }
 
         int totalPrice = 0;
@@ -77,7 +79,7 @@ public class OrderService {
                     productMapper.findById(cartItem.getProductId());
 
             if (product == null || Boolean.TRUE.equals(product.getDeleted())) {
-                throw new RuntimeException("商品が存在しません。");
+                throw new ResourceNotFoundException("商品が存在しません。");
             }
 
             // 悲観ロックで在庫取得
@@ -87,11 +89,11 @@ public class OrderService {
                     );
 
             if (stock == null) {
-                throw new RuntimeException("在庫情報が存在しません。");
+                throw new ResourceNotFoundException("在庫情報が存在しません。");
             }
 
             if (stock.getStockQuantity() < cartItem.getQuantity()) {
-                throw new RuntimeException(
+                throw new BusinessException(
                         product.getName() + " の在庫が不足しています。"
                 );
             }
@@ -135,7 +137,7 @@ public class OrderService {
                     productStockMapper.update(stock);
 
             if (updateCount == 0) {
-                throw new RuntimeException(
+                throw new BusinessException(
                         "在庫更新に失敗しました。"
                 );
             }
@@ -203,12 +205,12 @@ public class OrderService {
         Order order = orderMapper.findById(orderId);
 
         if (order == null) {
-            throw new RuntimeException("注文が存在しません。");
+            throw new ResourceNotFoundException("注文が存在しません。");
         }
 
         // 他ユーザーの注文参照防止
         if (!order.getUserId().equals(userId)) {
-            throw new RuntimeException("参照権限がありません。");
+            throw new BusinessException("参照権限がありません。");
         }
 
         // 注文商品取得

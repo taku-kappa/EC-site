@@ -7,6 +7,8 @@ import backend.dto.response.CartResponse;
 import backend.entity.Cart;
 import backend.entity.CartItem;
 import backend.entity.Product;
+import backend.exception.BusinessException;
+import backend.exception.ResourceNotFoundException;
 import backend.mapper.CartItemMapper;
 import backend.mapper.CartMapper;
 import backend.mapper.ProductMapper;
@@ -102,7 +104,7 @@ public class CartService {
         Product product = productMapper.findById(request.getProductId());
 
         if (product == null) {
-            throw new RuntimeException("商品が存在しません。");
+            throw new ResourceNotFoundException("商品が存在しません。");
         }
 
         CartItem cartItem =
@@ -150,19 +152,19 @@ public class CartService {
         Cart cart = cartMapper.findByUserId(userId);
 
         if (cart == null) {
-            throw new RuntimeException("カートが存在しません。");
+            throw new ResourceNotFoundException("カートが存在しません。");
         }
 
         // 更新対象のカート商品を取得
         CartItem cartItem = cartItemMapper.findById(cartItemId);
 
         if (cartItem == null) {
-            throw new RuntimeException("カート内の商品が存在しません。");
+            throw new ResourceNotFoundException("カート内の商品が存在しません。");
         }
 
         // 他ユーザーのカート商品を更新できないようチェック
         if (!cart.getId().equals(cartItem.getCartId())) {
-            throw new RuntimeException("更新権限がありません。");
+            throw new BusinessException("更新権限がありません。");
         }
 
         // 数量を更新
@@ -190,19 +192,19 @@ public class CartService {
         Cart cart = cartMapper.findByUserId(userId);
 
         if (cart == null) {
-            throw new RuntimeException("カートが存在しません。");
+            throw new ResourceNotFoundException("カートが存在しません。");
         }
 
         // 削除対象のカート商品を取得
         CartItem cartItem = cartItemMapper.findById(cartItemId);
 
         if (cartItem == null) {
-            throw new RuntimeException("カート内の商品が存在しません。");
+            throw new ResourceNotFoundException("カート内の商品が存在しません。");
         }
 
         // 他ユーザーのカート商品を削除できないようチェック
         if (!cart.getId().equals(cartItem.getCartId())) {
-            throw new RuntimeException("削除権限がありません。");
+            throw new BusinessException("削除権限がありません。");
         }
 
         // カート商品を削除

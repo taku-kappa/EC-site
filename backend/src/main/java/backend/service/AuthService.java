@@ -4,6 +4,7 @@ import backend.dto.request.LoginRequest;
 import backend.dto.request.RegisterRequest;
 import backend.dto.response.AuthResponseData;
 import backend.entity.User;
+import backend.exception.BusinessException;
 import backend.mapper.UserMapper;
 import backend.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +39,8 @@ public class AuthService {
 
         // メールアドレス重複チェック
         if (userMapper.countByEmail(request.getEmail()) > 0) {
-            throw new RuntimeException(
-                    "Email is already in use."
+            throw new BusinessException(
+                    "このメールアドレスは既に登録されています。"
             );
         }
 

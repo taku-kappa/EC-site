@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +31,31 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
                 LocalDateTime.now());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+
+    /**
+     * バリデーションエラーを処理します。
+     *
+     * @param ex MethodArgumentNotValidException
+     * @return HTTP400(Bad Request)
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex) {
+
+        String message = ex.getBindingResult()
+                .getFieldError()
+                .getDefaultMessage();
+
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                message,
+                LocalDateTime.now()
+        );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -75,5 +101,4 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(response);
     }
-
 }
