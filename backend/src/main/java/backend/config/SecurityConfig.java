@@ -148,6 +148,12 @@ public class SecurityConfig {
                                 "/api/products/**"
                         ).permitAll()
 
+                        // カテゴリー一覧取得
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/categories/**"
+                        ).permitAll()
+
                         // 管理者のみ
                         .requestMatchers(
                                 HttpMethod.POST,

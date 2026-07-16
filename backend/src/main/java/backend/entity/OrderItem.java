@@ -1,51 +1,36 @@
 package backend.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "order_items")
 @Getter
 @Setter
 public class OrderItem {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // 注文明細ID
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    // 注文ID
+    private Long orderId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    // 商品ID
+    private Long productId;
 
-    @Column(name = "product_name", nullable = false, length = 255)
-    private String productName; // 購入時の商品名（マスター変更対策）
+    // 注文時点の商品名（スナップショット）
+    private String productName;
 
-    @Column(nullable = false)
-    private Integer price; // 購入時の価格（価格改定対策）
+    // 注文時点の商品価格（スナップショット）
+    private Integer price;
 
-    @Column(nullable = false)
+    // 注文数量
     private Integer quantity;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    // 作成日時
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    // 更新日時
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

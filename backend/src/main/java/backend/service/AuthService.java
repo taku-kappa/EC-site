@@ -2,7 +2,9 @@ package backend.service;
 
 import backend.dto.request.LoginRequest;
 import backend.dto.request.RegisterRequest;
+import backend.dto.response.AuthResponseData;
 import backend.entity.User;
+import backend.exception.BusinessException;
 import backend.mapper.UserMapper;
 import backend.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +39,8 @@ public class AuthService {
 
         // メールアドレス重複チェック
         if (userMapper.countByEmail(request.getEmail()) > 0) {
-            throw new RuntimeException(
-                    "Email is already in use."
+            throw new BusinessException(
+                    "このメールアドレスは既に登録されています。"
             );
         }
 
@@ -69,7 +71,7 @@ public class AuthService {
      * @param request ログインリクエスト
      * @return JWTトークン
      */
-    public String authenticateUser(LoginRequest request) {
+    public AuthResponseData authenticateUser(LoginRequest request) {
 
         // 認証実行
         Authentication authentication =
@@ -93,6 +95,14 @@ public class AuthService {
                 .setAuthentication(authentication);
 
         // JWT生成
-        return tokenProvider.generateToken(authentication);
+        String token = tokenProvider.generateToken(authentication);
+
+        // JWTトークンからユーザーID取得
+        Long userId = tokenProvider.getUserIdFromJWT(token);
+
+        AuthResponseData data =
+                new AuthResponseData(userId, token);
+
+        return data;
     }
 }

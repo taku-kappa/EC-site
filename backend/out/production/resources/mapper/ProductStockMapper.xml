@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backend.mapper.ProductStockMapper">
+
+    <!-- 商品在庫登録 -->
+    <insert id="insert">
+
+        INSERT INTO product_stocks
+        (
+        product_id,
+        stock_quantity,
+        version,
+        created_at,
+        updated_at
+        )
+        VALUES
+        (
+        #{productId},
+        #{stockQuantity},
+        0,
+        NOW(),
+        NOW()
+        )
+
+    </insert>
+
+    <!-- 商品在庫取得 -->
+    <select id="findByProductId"
+            parameterType="long"
+            resultType="backend.entity.ProductStock">
+
+        SELECT
+        id,
+        product_id AS productId,
+        stock_quantity AS stockQuantity,
+        version,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM product_stocks
+        WHERE product_id = #{productId}
+
+    </select>
+
+    <!-- 商品在庫更新(楽観ロック) -->
+    <update id="update"
+            parameterType="backend.entity.ProductStock">
+
+        UPDATE product_stocks
+        SET
+        stock_quantity = #{stockQuantity},
+        version = version + 1,
+        updated_at = NOW()
+        WHERE product_id = #{productId}
+        AND version = #{version}
+
+    </update>
+
+    <!-- 商品在庫取得（悲観ロック）-->
+    <select id="findByProductIdForUpdate"
+            parameterType="long"
+            resultType="backend.entity.ProductStock">
+
+        SELECT
+        id,
+        product_id AS productId,
+        stock_quantity AS stockQuantity,
+        version,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM product_stocks
+        WHERE product_id = #{productId}
+        FOR UPDATE
+
+    </select>
+
+</mapper>

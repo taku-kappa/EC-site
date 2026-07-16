@@ -1,53 +1,33 @@
 package backend.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-@Entity
-@Table(name = "orders")
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class Order {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // 注文ID
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    // 注文ユーザーID
+    private Long userId;
 
-    @Column(name = "total_price", nullable = false)
+    // 注文合計金額
     private Integer totalPrice;
 
-    @Column(nullable = false, length = 30)
-    private String status; // PENDING, ORDERED, CANCELLED など
+    // 注文ステータス （例：COMPLETED）
+    private String status;
 
-    @Column(name = "ordered_at", nullable = false)
+    // 注文日時
     private LocalDateTime orderedAt;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> orderItems = new ArrayList<>();
-
-    @Column(name = "created_at", nullable = false, updatable = false)
+    // 作成日時
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    // 更新日時
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.orderedAt = LocalDateTime.now();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
