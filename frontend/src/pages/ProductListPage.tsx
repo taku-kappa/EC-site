@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+import { AxiosError } from "axios";
+
 import { getProducts } from "../api/productApi";
 
 import type { Product } from "../types/product";
+import type { ErrorResponse } from "../types/errorResponse";
 
 /**
  * 商品一覧画面
@@ -22,49 +25,76 @@ function ProductListPage() {
     const [products, setProducts] = useState<Product[]>([]);
 
     /**
+     * エラーメッセージ
+     */
+    const [errorMessage, setErrorMessage] = useState("");
+
+    /**
      * 商品一覧取得
      */
-    // const loadProducts = async () => {
+    const loadProducts = async () => {
 
-    //     try {
+        /**
+         * 前回のエラーメッセージをクリア
+         */
+        setErrorMessage("");
 
-    //         const response = await getProducts();
+        try {
 
-    //         setProducts(response);
+            const response = await getProducts();
 
-    //     } catch (error) {
+            console.log("商品一覧レスポンス:", response);
+            console.log("配列か？", Array.isArray(response));
 
-    //         console.error(error);
+            setProducts(response);
 
-    //         alert("商品一覧の取得に失敗しました。");
+        } catch (error) {
 
-    //     }
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-    // };
+            /**
+             * 通信エラー
+             */
+            if (!axiosError.response) {
 
-const loadProducts = async () => {
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
 
-    try {
+                return;
 
-        const response = await getProducts();
+            }
 
-        console.log("商品一覧レスポンス:", response);
-        console.log("配列か？", Array.isArray(response));
+            switch (axiosError.response.status) {
 
-        setProducts(response);
+                case 404:
 
-    } catch (error) {
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
 
-        console.error(error);
+                    break;
 
-        alert("商品一覧の取得に失敗しました。");
+                case 500:
 
-    }
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
 
-};
+                    break;
 
+                default:
 
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
 
+            }
+
+        }
+
+    };
 
     /**
      * 初回表示時
@@ -80,6 +110,12 @@ const loadProducts = async () => {
         <div>
 
             <h1>商品一覧</h1>
+
+            {
+                errorMessage && (
+                    <p>{errorMessage}</p>
+                )
+            }
 
             {
 

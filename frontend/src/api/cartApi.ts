@@ -1,123 +1,75 @@
-import axios from "axios";
+import apiClient from "./apiClient";
 
-import type { AddCartRequest } from "../types/cart";
-
-import type { CartResponse } from "../types/cart";
+import type {
+    AddCartRequest,
+    CartResponse
+} from "../types/cart";
 
 import type { ApiResponse } from "../types/ApiResponse";
 
 /**
- * APIベースURL
- */
-const API_BASE_URL = "http://localhost:8081";
-
-/**
  * カート追加
+ *
+ * @param request カート追加情報
  */
 export const addCart = async (
-
     request: AddCartRequest
-
 ): Promise<void> => {
 
-    const token = localStorage.getItem("token");
-
-    await axios.post<ApiResponse<void>>(
-
-        `${API_BASE_URL}/api/cart/items`,
-
-        request,
-
-        {
-            headers: {
-
-                Authorization: `Bearer ${token}`
-
-            }
-
-        }
-
+    await apiClient.post<ApiResponse<void>>(
+        "/cart/items",
+        request
     );
 
 };
 
 /**
  * カート一覧取得
+ *
+ * @returns カート情報
  */
 export const getCart = async (): Promise<CartResponse> => {
 
-    const token = localStorage.getItem("token");
-
-    const response = await axios.get<ApiResponse<CartResponse>>(
-        `${API_BASE_URL}/api/cart`,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
-    );
+    const response =
+        await apiClient.get<ApiResponse<CartResponse>>(
+            "/cart"
+        );
 
     return response.data.data;
+
 };
 
 /**
- * 数量変更
+ * カート商品の数量変更
+ *
+ * @param cartItemId カート商品ID
+ * @param quantity 数量
  */
 export const updateCartQuantity = async (
-
     cartItemId: number,
-
     quantity: number
-
 ): Promise<void> => {
 
-    const token = localStorage.getItem("token");
-
-    await axios.put<ApiResponse<void>>(
-
-        `${API_BASE_URL}/api/cart/items/${cartItemId}`,
-
+    await apiClient.put<ApiResponse<void>>(
+        `/cart/items/${cartItemId}`,
         {
             quantity
-        },
-
-        {
-            headers: {
-
-                Authorization: `Bearer ${token}`
-
-            }
-
         }
-
     );
 
 };
 
 /**
  * カート商品削除
+ *
+ * @param cartItemId カート商品ID
  */
 export const deleteCartItem = async (
-
     cartItemId: number
-
 ): Promise<void> => {
 
-    const token = localStorage.getItem("token");
-
-    await axios.delete<ApiResponse<void>>(
-
-        `${API_BASE_URL}/api/cart/items/${cartItemId}`,
-
-        {
-            headers: {
-
-                Authorization: `Bearer ${token}`
-
-            }
-
-        }
-
+    await apiClient.delete<ApiResponse<void>>(
+        `/cart/items/${cartItemId}`
     );
 
 };

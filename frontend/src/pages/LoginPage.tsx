@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { login } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
+
+import { login } from "../api/userApi";
+
+import type { ErrorResponse } from "../types/errorResponse";
 
 /**
  * ログイン画面
@@ -24,6 +28,11 @@ function LoginPage() {
      */
     const handleLogin = async () => {
 
+        /**
+         * 前回表示したエラーメッセージをクリア
+         */
+        setErrorMessage("");
+
         try {
 
             const response = await login({
@@ -41,20 +50,60 @@ function LoginPage() {
 
             navigate("/products");
 
-        } catch {
+        } catch (error) {
 
-            setErrorMessage(
-                "メールアドレスまたはパスワードが正しくありません"
-            );
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
+
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+            }
+
+            switch (axiosError.response.status) {
+
+                case 400:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
+
         }
+
     };
 
     return (
+
         <div>
+
             <h1>ログイン</h1>
 
             <div>
+
                 <label>メールアドレス</label>
+
                 <br />
 
                 <input
@@ -64,12 +113,15 @@ function LoginPage() {
                         setEmail(e.target.value)
                     }
                 />
+
             </div>
 
             <br />
 
             <div>
+
                 <label>パスワード</label>
+
                 <br />
 
                 <input
@@ -79,18 +131,23 @@ function LoginPage() {
                         setPassword(e.target.value)
                     }
                 />
+
             </div>
 
             <br />
 
-            {errorMessage && (
-                <p>{errorMessage}</p>
-            )}
+            {
+                errorMessage && (
+                    <p>{errorMessage}</p>
+                )
+            }
 
             <button onClick={handleLogin}>
                 ログイン
             </button>
+
         </div>
+
     );
 }
 
