@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+import { AxiosError } from "axios";
+
 import { getOrderHistory } from "../api/orderApi";
 
 import type { OrderHistoryResponse } from "../types/order";
+import type { ErrorResponse } from "../types/errorResponse";
 
 /**
  * 注文履歴一覧画面
@@ -23,9 +26,20 @@ function OrderHistoryPage() {
         useState<OrderHistoryResponse[]>([]);
 
     /**
+     * エラーメッセージ
+     */
+    const [errorMessage, setErrorMessage] =
+        useState("");
+
+    /**
      * 注文履歴取得
      */
     const loadOrders = async () => {
+
+        /**
+         * 前回のエラーメッセージをクリア
+         */
+        setErrorMessage("");
 
         try {
 
@@ -36,9 +50,47 @@ function OrderHistoryPage() {
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("注文履歴の取得に失敗しました。");
+            /**
+             * 通信エラー
+             */
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 400:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         }
 
@@ -49,7 +101,7 @@ function OrderHistoryPage() {
      */
     useEffect(() => {
 
-        loadOrders();
+        void loadOrders();
 
     }, []);
 
@@ -58,6 +110,12 @@ function OrderHistoryPage() {
         <div>
 
             <h1>注文履歴</h1>
+
+            {
+                errorMessage && (
+                    <p>{errorMessage}</p>
+                )
+            }
 
             {
 

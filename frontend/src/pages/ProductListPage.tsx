@@ -43,9 +43,6 @@ function ProductListPage() {
 
             const response = await getProducts();
 
-            console.log("商品一覧レスポンス:", response);
-            console.log("配列か？", Array.isArray(response));
-
             setProducts(response);
 
         } catch (error) {

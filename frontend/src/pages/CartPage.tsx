@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import {
+import { AxiosError } from "axios";
 
+import {
     getCart,
     updateCartQuantity,
     deleteCartItem
@@ -13,6 +14,8 @@ import type {
     CartItem,
     CartResponse
 } from "../types/cart";
+
+import type { ErrorResponse } from "../types/errorResponse";
 
 /**
  * カート画面
@@ -30,6 +33,11 @@ function CartPage() {
     const [totalPrice, setTotalPrice] = useState(0);
 
     /**
+     * エラーメッセージ
+     */
+    const [errorMessage, setErrorMessage] = useState("");
+
+    /**
      * 画面遷移用
      */
     const navigate = useNavigate();
@@ -38,6 +46,11 @@ function CartPage() {
      * カート一覧取得
      */
     const loadCart = async () => {
+
+        /**
+         * 前回のエラーメッセージをクリア
+         */
+        setErrorMessage("");
 
         try {
 
@@ -49,11 +62,50 @@ function CartPage() {
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("カート情報の取得に失敗しました。");
+            /**
+             * 通信エラー
+             */
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 400:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         }
+
     };
 
     /**
@@ -76,6 +128,11 @@ function CartPage() {
 
     ) => {
 
+        /**
+         * 前回のエラーメッセージをクリア
+         */
+        setErrorMessage("");
+
         try {
 
             await updateCartQuantity(
@@ -87,11 +144,50 @@ function CartPage() {
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("数量変更に失敗しました。");
+            /**
+             * 通信エラー
+             */
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 400:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         }
+
     };
 
     /**
@@ -103,6 +199,11 @@ function CartPage() {
 
     ) => {
 
+        /**
+         * 前回のエラーメッセージをクリア
+         */
+        setErrorMessage("");
+
         try {
 
             await deleteCartItem(cartItemId);
@@ -111,143 +212,187 @@ function CartPage() {
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("商品削除に失敗しました。");
+            /**
+             * 通信エラー
+             */
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 400:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         }
-    };
 
+    };
 
     return (
 
-    <div>
+        <div>
 
-        <h1>カート</h1>
+            <h1>カート</h1>
 
-        {
+            {
+                errorMessage && (
+                    <p>{errorMessage}</p>
+                )
+            }
 
-            cartItems.length === 0 ? (
+            {
 
-                <p>カートに商品がありません。</p>
+                cartItems.length === 0 ? (
 
-            ) : (
+                    <p>カートに商品がありません。</p>
 
-                <>
+                ) : (
 
-                    {
+                    <>
 
-                        cartItems.map((item) => (
+                        {
 
-                            <div
-                                key={item.cartItemId}
+                            cartItems.map((item) => (
 
-                                style={{
+                                <div
+                                    key={item.cartItemId}
 
-                                    border: "1px solid gray",
+                                    style={{
 
-                                    padding: "10px",
+                                        border: "1px solid gray",
 
-                                    marginBottom: "10px"
+                                        padding: "10px",
 
-                                }}
-                            >
+                                        marginBottom: "10px"
 
-                                <h3>
-                                    {item.productName}
-                                </h3>
-
-                                <p>
-                                    価格：{item.price}円
-                                </p>
-
-                                <p>
-                                    小計：{item.subtotal}円
-                                </p>
-
-                                <label>
-                                    数量
-                                </label>
-
-                                <br />
-
-                                <input
-                                    type="number"
-
-                                    min={1}
-
-                                    value={item.quantity}
-
-                                    onChange={(e) =>
-
-                                        handleQuantityChange(
-
-                                            item.cartItemId,
-
-                                            Number(e.target.value)
-
-                                        )
-
-                                    }
-                                />
-
-                                <br />
-
-                                <br />
-
-                                <button
-                                    onClick={() =>
-
-                                        handleDelete(
-
-                                            item.cartItemId
-
-                                        )
-
-                                    }
+                                    }}
                                 >
 
-                                    商品削除
+                                    <h3>
+                                        {item.productName}
+                                    </h3>
 
-                                </button>
+                                    <p>
+                                        価格：{item.price}円
+                                    </p>
 
-                            </div>
+                                    <p>
+                                        小計：{item.subtotal}円
+                                    </p>
 
-                        ))
+                                    <label>
+                                        数量
+                                    </label>
 
-                    }
+                                    <br />
 
-                    <hr />
+                                    <input
+                                        type="number"
 
-                    <h2>
-                        合計金額：{totalPrice}円
-                    </h2>
+                                        min={1}
 
-                    <br />
+                                        value={item.quantity}
 
-                    <button
-                        onClick={() => navigate("/products")}
-                    >
-                        買い物を続ける
-                    </button>
+                                        onChange={(e) =>
 
-                    {" "}
+                                            handleQuantityChange(
 
-                    <button
-                        onClick={() => navigate("/order-confirm")}
-                    >
-                        注文確認へ
-                    </button>
+                                                item.cartItemId,
 
-                </>
+                                                Number(e.target.value)
 
-            )
+                                            )
 
-        }
+                                        }
+                                    />
 
-    </div>
+                                    <br />
 
-);
+                                    <br />
+
+                                    <button
+                                        onClick={() =>
+
+                                            handleDelete(
+
+                                                item.cartItemId
+
+                                            )
+
+                                        }
+                                    >
+
+                                        商品削除
+
+                                    </button>
+
+                                </div>
+
+                            ))
+
+                        }
+
+                        <hr />
+
+                        <h2>
+                            合計金額：{totalPrice}円
+                        </h2>
+
+                        <br />
+
+                        <button
+                            onClick={() => navigate("/products")}
+                        >
+                            買い物を続ける
+                        </button>
+
+                        {" "}
+
+                        <button
+                            onClick={() => navigate("/order-confirm")}
+                        >
+                            注文確認へ
+                        </button>
+
+                    </>
+
+                )
+
+            }
+
+        </div>
+
+    );
 
 }
 

@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { getCart } from "../api/cartApi";
+import { AxiosError } from "axios";
 
+import { getCart } from "../api/cartApi";
 import { createOrder } from "../api/orderApi";
 
 import type { CartResponse } from "../types/cart";
+import type { ErrorResponse } from "../types/errorResponse";
 
 /**
  * 注文確認画面
@@ -31,9 +33,17 @@ function OrderConfirmPage() {
         useState(false);
 
     /**
+     * エラーメッセージ
+     */
+    const [errorMessage, setErrorMessage] =
+        useState("");
+
+    /**
      * カート取得
      */
     const loadCart = async () => {
+
+        setErrorMessage("");
 
         try {
 
@@ -43,9 +53,44 @@ function OrderConfirmPage() {
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("注文情報の取得に失敗しました。");
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 400:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         }
 
@@ -72,6 +117,8 @@ function OrderConfirmPage() {
 
         }
 
+        setErrorMessage("");
+
         try {
 
             setOrdering(true);
@@ -86,9 +133,44 @@ function OrderConfirmPage() {
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("注文に失敗しました。");
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 400:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         } finally {
 
@@ -103,7 +185,7 @@ function OrderConfirmPage() {
      */
     useEffect(() => {
 
-        loadCart();
+        void loadCart();
 
     }, []);
 
@@ -112,7 +194,27 @@ function OrderConfirmPage() {
      */
     if (cart == null) {
 
-        return <p>読み込み中...</p>;
+        return (
+
+            <div>
+
+                <h1>注文確認</h1>
+
+                {
+                    errorMessage && (
+                        <p>{errorMessage}</p>
+                    )
+                }
+
+                {
+                    !errorMessage && (
+                        <p>読み込み中...</p>
+                    )
+                }
+
+            </div>
+
+        );
 
     }
 
@@ -121,6 +223,12 @@ function OrderConfirmPage() {
         <div>
 
             <h1>注文確認</h1>
+
+            {
+                errorMessage && (
+                    <p>{errorMessage}</p>
+                )
+            }
 
             <hr />
 
@@ -156,10 +264,7 @@ function OrderConfirmPage() {
             <hr />
 
             <h2>
-
-                合計金額：
-                {cart.totalPrice}円
-
+                合計金額：{cart.totalPrice}円
             </h2>
 
             <br />
@@ -167,9 +272,7 @@ function OrderConfirmPage() {
             <button
                 onClick={() => navigate("/cart")}
             >
-
                 カートへ戻る
-
             </button>
 
             {" "}
@@ -180,11 +283,9 @@ function OrderConfirmPage() {
             >
 
                 {
-
                     ordering
                         ? "注文中..."
                         : "注文を確定する"
-
                 }
 
             </button>

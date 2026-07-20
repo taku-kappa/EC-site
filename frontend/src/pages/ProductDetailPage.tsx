@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 
+import { AxiosError } from "axios";
+
 import { getProductById } from "../api/productApi";
-
-import type { Product } from "../types/product";
-
 import { addCart } from "../api/cartApi";
 
-
+import type { Product } from "../types/product";
+import type { ErrorResponse } from "../types/errorResponse";
 
 /**
  * 商品詳細画面
@@ -31,6 +31,11 @@ function ProductDetailPage() {
     const [quantity, setQuantity] = useState(1);
 
     /**
+     * エラーメッセージ
+     */
+    const [errorMessage, setErrorMessage] = useState("");
+
+    /**
      * 画面遷移用
      */
     const navigate = useNavigate();
@@ -40,6 +45,11 @@ function ProductDetailPage() {
      */
     const loadProduct = async () => {
 
+        /**
+         * 前回のエラーメッセージをクリア
+         */
+        setErrorMessage("");
+
         try {
 
             if (!id) {
@@ -48,17 +58,54 @@ function ProductDetailPage() {
 
             }
 
-            const response = await getProductById(
-                Number(id)
-            );
+            const response =
+                await getProductById(Number(id));
 
             setProduct(response);
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("商品取得に失敗しました。");
+            /**
+             * 通信エラー
+             */
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 404:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         }
 
@@ -75,6 +122,11 @@ function ProductDetailPage() {
 
         }
 
+        /**
+         * 前回のエラーメッセージをクリア
+         */
+        setErrorMessage("");
+
         try {
 
             await addCart({
@@ -89,9 +141,47 @@ function ProductDetailPage() {
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("カート追加に失敗しました。");
+            /**
+             * 通信エラー
+             */
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 400:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         }
 
@@ -107,11 +197,31 @@ function ProductDetailPage() {
     }, []);
 
     /**
-     * 読み込み中
+     * 商品未取得時
      */
     if (!product) {
 
-        return <p>読み込み中...</p>;
+        return (
+
+            <div>
+
+                <h1>商品詳細</h1>
+
+                {
+                    errorMessage && (
+                        <p>{errorMessage}</p>
+                    )
+                }
+
+                {
+                    !errorMessage && (
+                        <p>読み込み中...</p>
+                    )
+                }
+
+            </div>
+
+        );
 
     }
 
@@ -120,6 +230,12 @@ function ProductDetailPage() {
         <div>
 
             <h1>商品詳細</h1>
+
+            {
+                errorMessage && (
+                    <p>{errorMessage}</p>
+                )
+            }
 
             <h2>{product.name}</h2>
 
@@ -144,6 +260,7 @@ function ProductDetailPage() {
             }
 
             <div>
+
                 <label>数量</label>
 
                 <br />
@@ -157,14 +274,15 @@ function ProductDetailPage() {
                         const value = Number(e.target.value);
 
                         if (value >= 1) {
+
                             setQuantity(value);
+
                         }
 
                     }}
                 />
-            </div>
 
-            <br />
+            </div>
 
             <br />
 

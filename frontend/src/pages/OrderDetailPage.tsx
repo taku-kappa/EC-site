@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 
+import { AxiosError } from "axios";
+
 import { getOrderDetail } from "../api/orderApi";
 
 import type { OrderHistoryDetailResponse } from "../types/order";
+import type { ErrorResponse } from "../types/errorResponse";
 
 /**
  * 注文履歴詳細画面
@@ -28,9 +31,20 @@ function OrderDetailPage() {
         useState<OrderHistoryDetailResponse | null>(null);
 
     /**
+     * エラーメッセージ
+     */
+    const [errorMessage, setErrorMessage] =
+        useState("");
+
+    /**
      * 注文詳細取得
      */
     const loadOrder = async () => {
+
+        /**
+         * 前回のエラーメッセージをクリア
+         */
+        setErrorMessage("");
 
         if (!id) {
 
@@ -47,9 +61,47 @@ function OrderDetailPage() {
 
         } catch (error) {
 
-            console.error(error);
+            const axiosError =
+                error as AxiosError<ErrorResponse>;
 
-            alert("注文詳細の取得に失敗しました。");
+            /**
+             * 通信エラー
+             */
+            if (!axiosError.response) {
+
+                setErrorMessage(
+                    "通信エラーが発生しました。"
+                );
+
+                return;
+
+            }
+
+            switch (axiosError.response.status) {
+
+                case 404:
+
+                    setErrorMessage(
+                        axiosError.response.data.message
+                    );
+
+                    break;
+
+                case 500:
+
+                    setErrorMessage(
+                        "システムエラーが発生しました。"
+                    );
+
+                    break;
+
+                default:
+
+                    setErrorMessage(
+                        "予期しないエラーが発生しました。"
+                    );
+
+            }
 
         }
 
@@ -60,7 +112,7 @@ function OrderDetailPage() {
      */
     useEffect(() => {
 
-        loadOrder();
+        void loadOrder();
 
     }, []);
 
@@ -69,7 +121,27 @@ function OrderDetailPage() {
      */
     if (order == null) {
 
-        return <p>読み込み中...</p>;
+        return (
+
+            <div>
+
+                <h1>注文詳細</h1>
+
+                {
+                    errorMessage && (
+                        <p>{errorMessage}</p>
+                    )
+                }
+
+                {
+                    !errorMessage && (
+                        <p>読み込み中...</p>
+                    )
+                }
+
+            </div>
+
+        );
 
     }
 
@@ -78,6 +150,12 @@ function OrderDetailPage() {
         <div>
 
             <h1>注文詳細</h1>
+
+            {
+                errorMessage && (
+                    <p>{errorMessage}</p>
+                )
+            }
 
             <hr />
 
