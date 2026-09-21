@@ -238,3 +238,30 @@ public class OrderService {
     }
 
 }
+
+
+
+
+
+//import java.util.function.Consumer;
+//
+//public class Main {
+//
+//    // 「関数（Consumer）」を引数として受け取るメソッド
+//    public static void doSomethingAsync(Consumer<String> resolve) {
+//        // 引数として受け取った「resolve」は関数なので、ここで実行（.accept）できる！
+//        // このとき、"ハロー" という文字列を引数として渡している
+//        resolve.accept("ハロー");
+//    }
+//
+//    public static void main(String[] args) {
+//        // doSomethingAsync を呼び出す際に、「実行してほしい処理（関数）」を直接渡す
+//        doSomethingAsync((data) -> {
+//            System.out.println("結果を表示: " + data);
+//        });
+//    }
+//
+//    public void  data() {
+//
+//    }
+//}
