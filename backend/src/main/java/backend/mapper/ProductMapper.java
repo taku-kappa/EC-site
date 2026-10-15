@@ -65,4 +65,14 @@ public interface ProductMapper {
      */
     int deleteById(Long id);
 
+    /**
+     * 在庫切れ商品一覧取得
+     *
+     * @param categoryId カテゴリID
+     * @return 在庫切れ商品一覧
+     */
+    List<ProductListResponse> findProductsOutOfStock(
+            @Param("categoryId") Long categoryId
+    );
+
 }

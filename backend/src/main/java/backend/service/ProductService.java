@@ -43,6 +43,20 @@ public class ProductService {
     }
 
     /**
+     * 在庫切れ商品一覧取得
+     *
+     * カテゴリIDが指定された場合は、そのカテゴリの在庫切れ商品を取得する。
+     * カテゴリIDがnullの場合は、すべてのカテゴリの在庫切れ商品を取得する。
+     *
+     * @param categoryId カテゴリID
+     * @return 在庫切れ商品一覧
+     */
+    public List<ProductListResponse> getProductsOutOfStock(Long categoryId) {
+
+        return productMapper.findProductsOutOfStock(categoryId);
+    }
+
+    /**
      * 商品詳細取得
      *
      * @param id 商品ID

@@ -142,6 +142,12 @@ public class SecurityConfig {
                                 "/api/auth/**"
                         ).permitAll()
 
+                        // 在庫切れ商品一覧（管理者専用）
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/products/out-of-stock"
+                        ).hasRole("ADMIN")
+
                         // 商品閲覧
                         .requestMatchers(
                                 HttpMethod.GET,

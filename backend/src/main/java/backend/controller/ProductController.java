@@ -40,7 +40,7 @@ public class ProductController {
     /**
      * 商品一覧取得
      *
-     * GET /products
+     * GET /api/products
      *
      * @param categoryId カテゴリID
      * @return 商品一覧
@@ -51,6 +51,22 @@ public class ProductController {
             Long categoryId) {
 
         return productService.getProducts(categoryId);
+    }
+
+    /**
+     * 在庫切れ商品一覧取得
+     *
+     * GET /api/products/out-of-stock
+     *
+     * @param categoryId カテゴリID
+     * @return 在庫切れ商品一覧
+     */
+    @GetMapping("/out-of-stock")
+    public List<ProductListResponse> getProductOutOfStock(
+            @RequestParam(required = false)
+            Long categoryId) {
+
+        return productService.getProductsOutOfStock(categoryId);
     }
 
     /**
