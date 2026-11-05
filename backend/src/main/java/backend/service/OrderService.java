@@ -4,6 +4,7 @@ import backend.dto.response.OrderHistoryDetailResponse;
 import backend.dto.response.OrderHistoryResponse;
 import backend.dto.response.OrderItemResponse;
 import backend.dto.response.OrderResponse;
+import backend.dto.response.ProductSalesCountResponse;
 import backend.entity.Cart;
 import backend.entity.CartItem;
 import backend.entity.Order;
@@ -237,6 +238,17 @@ public class OrderService {
         return response;
     }
 
+    /**
+     * 商品販売数一覧を取得します。
+     *
+     * @return 商品別販売数一覧
+     */
+    public List<ProductSalesCountResponse> getProductSalesCounts() {
+        List<ProductSalesCountResponse> responses =
+                orderItemMapper.findProductSalesCounts();
+
+        return responses;
+    }
 }
 
 

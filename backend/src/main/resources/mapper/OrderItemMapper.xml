@@ -53,4 +53,23 @@
 
     </select>
 
+    <!-- 商品販売数を取得 -->
+    <select id="findProductSalesCounts"
+            resultType="backend.dto.response.ProductSalesCountResponse">
+
+        SELECT
+        oi.product_id AS productId,
+        oi.product_name AS productName,
+        SUM(oi.quantity) AS salesQuantity
+        FROM orders AS o
+        INNER JOIN order_items AS oi
+            ON o.id = oi.order_id
+        WHERE o.status = 'COMPLETED'
+        GROUP BY
+            oi.product_id,
+            oi.product_name
+        ORDER BY
+            salesQuantity DESC;
+    </select>
+
 </mapper>

@@ -1,6 +1,7 @@
 package backend.mapper;
 
 import backend.dto.response.OrderItemResponse;
+import backend.dto.response.ProductSalesCountResponse;
 import backend.entity.OrderItem;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -32,4 +33,11 @@ public interface OrderItemMapper {
      * @return 注文商品一覧
      */
     List<OrderItemResponse> findOrderItems(Long orderId);
+
+    /**
+     * 商品別販売数取得
+     *
+     * @return 商品販売数一覧
+     */
+    List<ProductSalesCountResponse> findProductSalesCounts();
 }

@@ -4,6 +4,7 @@ import backend.dto.response.ApiResponse;
 import backend.dto.response.OrderHistoryDetailResponse;
 import backend.dto.response.OrderHistoryResponse;
 import backend.dto.response.OrderResponse;
+import backend.dto.response.ProductSalesCountResponse;
 import backend.security.CustomUserDetails;
 import backend.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -86,6 +87,19 @@ public class OrderController {
                         userDetails.getId(),
                         orderId
                 );
+
+        return ApiResponse.success(response);
+    }
+
+    /**
+     * 商品販売数一覧を取得します。
+     *
+     * @return 商品別販売数一覧
+     */
+    @GetMapping("/orders/product-sales-counts")
+    public ApiResponse<List<ProductSalesCountResponse>> getProductSalesCounts() {
+        List<ProductSalesCountResponse> response =
+                orderService.getProductSalesCounts();
 
         return ApiResponse.success(response);
     }
