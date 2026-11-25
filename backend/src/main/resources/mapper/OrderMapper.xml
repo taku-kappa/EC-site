@@ -64,4 +64,52 @@
 
     </select>
 
+    <!-- ユーザー別購入金額一覧を取得 -->
+    <select id="findUserPurchaseAmount"
+            resultType="backend.dto.response.UserPurchaseAmountResponse">
+
+        SELECT
+        u.id AS userId,
+        u.name AS userName,
+        SUM(o.total_price) AS totalPurchaseAmount
+
+        FROM users u
+
+        INNER JOIN
+        orders o
+        ON
+        u.id = o.user_id
+
+        WHERE
+        o.status = 'COMPLETED'
+
+        GROUP BY
+        u.id, u.name
+
+        ORDER BY
+        totalPurchaseAmount DESC,
+        u.id ASC
+
+        LIMIT
+        #{size}
+
+        OFFSET
+        #{offset}
+
+    </select>
+
+    <!-- ユーザー別購入金額の総件数を取得 -->
+    <select id="countUserPurchaseAmount"
+            resultType="java.lang.Long">
+
+        SELECT
+        COUNT(DISTINCT user_id)
+
+        FROM
+        orders
+
+        WHERE
+        status = 'COMPLETED'
+
+    </select>
 </mapper>

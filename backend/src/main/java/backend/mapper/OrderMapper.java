@@ -1,8 +1,10 @@
 package backend.mapper;
 
 import backend.dto.response.OrderHistoryResponse;
+import backend.dto.response.UserPurchaseAmountResponse;
 import backend.entity.Order;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -26,10 +28,29 @@ public interface OrderMapper {
     Order findById(Long id);
 
     /**
-     * ユーザーの注文履歴一覧取得
+     * ユーザーの注文履歴一覧を取得します。
      *
      * @param userId ユーザーID
      * @return 注文履歴一覧
      */
     List<OrderHistoryResponse> findOrderHistory(Long userId);
+
+    /**
+     * ユーザー別購入金額一覧を取得します。
+     *
+     * @param size 1ページあたりの取得件数
+     * @param offset 取得開始位置
+     * @return ユーザー別購入金額一覧
+     */
+    List<UserPurchaseAmountResponse> findUserPurchaseAmount(
+            @Param("size") Integer size,
+            @Param("offset") Integer offset
+    );
+
+    /**
+     * ユーザー別購入金額総件数を取得します。
+     *
+     * @return ユーザー別購入金額総件数
+     */
+    Long countUserPurchaseAmount();
 }

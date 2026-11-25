@@ -5,6 +5,8 @@ import backend.dto.response.OrderHistoryDetailResponse;
 import backend.dto.response.OrderHistoryResponse;
 import backend.dto.response.OrderResponse;
 import backend.dto.response.ProductSalesCountResponse;
+import backend.dto.response.UserPurchaseAmountPageResponse;
+import backend.exception.ResourceNotFoundException;
 import backend.security.CustomUserDetails;
 import backend.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -100,6 +103,24 @@ public class OrderController {
     public ApiResponse<List<ProductSalesCountResponse>> getProductSalesCounts() {
         List<ProductSalesCountResponse> response =
                 orderService.getProductSalesCounts();
+
+        return ApiResponse.success(response);
+    }
+
+    /**
+     * ユーザー別購入金額を取得します。
+     *
+     *
+     */
+    @GetMapping("/orders/user-purchase-amounts")
+    public ApiResponse<UserPurchaseAmountPageResponse> getUserPurchaseAmount(
+            @RequestParam(defaultValue = "0") Integer page) {
+        // pageが負数の場合は例外をスローする
+        if(page < 0) {
+            throw new IllegalArgumentException("pageは0以上を指定してください。");
+        }
+
+        UserPurchaseAmountPageResponse response = orderService.getUserPurchaseAmount(page);
 
         return ApiResponse.success(response);
     }

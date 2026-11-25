@@ -5,6 +5,8 @@ import backend.dto.response.OrderHistoryResponse;
 import backend.dto.response.OrderItemResponse;
 import backend.dto.response.OrderResponse;
 import backend.dto.response.ProductSalesCountResponse;
+import backend.dto.response.UserPurchaseAmountPageResponse;
+import backend.dto.response.UserPurchaseAmountResponse;
 import backend.entity.Cart;
 import backend.entity.CartItem;
 import backend.entity.Order;
@@ -248,6 +250,47 @@ public class OrderService {
                 orderItemMapper.findProductSalesCounts();
 
         return responses;
+    }
+
+    /**
+     * ユーザー別購入金額を取得します。
+     *
+     * @param page ページ番号（省略時は0）
+     * @return ユーザー別購入金額一覧とページ情報
+     */
+    public UserPurchaseAmountPageResponse getUserPurchaseAmount(Integer page) {
+        // １ページあたりの取得件数
+        Integer size = 20;
+
+        // pageが渡されなかった場合は0を設定
+        if(page == null) {
+            page = 0;
+        }
+
+        // pageが負数の場合は例外をスローする
+        if(page < 0) {
+            throw new IllegalArgumentException("pageは0以上を指定してください。");
+        }
+
+        Integer offset = page * size;
+
+        List<UserPurchaseAmountResponse> userPurchaseAmount =
+                orderMapper.findUserPurchaseAmount(size, offset);
+
+        Long countUserPurchaseAmount = orderMapper.countUserPurchaseAmount();
+
+        Integer totalPages = Math.toIntExact((countUserPurchaseAmount + size - 1) / size);
+
+        // レスポンス生成
+        UserPurchaseAmountPageResponse response = new UserPurchaseAmountPageResponse();
+
+        response.setUserPurchaseAmount(userPurchaseAmount);
+        response.setPage(page);
+        response.setSize(size);
+        response.setTotalElements(countUserPurchaseAmount);
+        response.setTotalPages(totalPages);
+
+        return response;
     }
 }
 

@@ -182,6 +182,12 @@ public class SecurityConfig {
                                 "/api/orders/product-sales-counts"
                         ).hasRole("ADMIN")
 
+                        // ユーザー別購入金額取得（管理者専用）
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/orders/user-purchase-amounts"
+                        ).hasRole("ADMIN")
+
                         // USER / ADMIN
                         .requestMatchers(
                                 "/api/orders/**",
