@@ -1,6 +1,7 @@
 package backend.controller;
 
 import backend.dto.response.ApiResponse;
+import backend.dto.response.MonthlySalesListResponse;
 import backend.dto.response.OrderHistoryDetailResponse;
 import backend.dto.response.OrderHistoryResponse;
 import backend.dto.response.OrderResponse;
@@ -121,6 +122,23 @@ public class OrderController {
         }
 
         UserPurchaseAmountPageResponse response = orderService.getUserPurchaseAmount(page);
+
+        return ApiResponse.success(response);
+    }
+
+    /**
+     * 月別売上金額を取得します。
+     *
+     * @param startMonth 集計対象の開始月（YYYY-MM）
+     * @param endMonth 集計対象の終了月（YYYY-MM）
+     * @return 月別売上金額の一覧と対象月（始め・終わり）
+     */
+    @GetMapping("/orders/monthly-sales")
+    public ApiResponse<MonthlySalesListResponse> getMonthlySalesList(
+            @RequestParam String startMonth,
+            @RequestParam String endMonth) {
+        MonthlySalesListResponse response =
+                orderService.getMonthlySalesList(startMonth, endMonth);
 
         return ApiResponse.success(response);
     }

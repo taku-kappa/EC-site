@@ -188,6 +188,12 @@ public class SecurityConfig {
                                 "/api/orders/user-purchase-amounts"
                         ).hasRole("ADMIN")
 
+                        // 月別売上金額取得（管理者専用）
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/orders/monthly-sales"
+                        ).hasRole("ADMIN")
+
                         // USER / ADMIN
                         .requestMatchers(
                                 "/api/orders/**",

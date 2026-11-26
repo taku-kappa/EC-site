@@ -1,11 +1,13 @@
 package backend.mapper;
 
+import backend.dto.response.MonthlySalesResponse;
 import backend.dto.response.OrderHistoryResponse;
 import backend.dto.response.UserPurchaseAmountResponse;
 import backend.entity.Order;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.YearMonth;
 import java.util.List;
 
 // 注文Mapper
@@ -53,4 +55,16 @@ public interface OrderMapper {
      * @return ユーザー別購入金額総件数
      */
     Long countUserPurchaseAmount();
+
+    /**
+     * 月別売上金額を取得します。
+     *
+     * @param start 集計対象の開始月（YYYY-MM）
+     * @param end 集計対象の終了月（YYYY-MM）
+     * @return 月別売上金額の一覧
+     */
+    List<MonthlySalesResponse> findMonthlySales (
+            @Param("start") YearMonth start,
+            @Param("end") YearMonth end
+    );
 }

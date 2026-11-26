@@ -112,4 +112,30 @@
         status = 'COMPLETED'
 
     </select>
+    
+<!-- 月間売上金額を取得 -->
+    <select id="findMonthlySales"
+            resultType="backend.dto.response.MonthlySalesResponse">
+
+        SELECT
+        DATE_FORMAT(ordered_at, '%Y-%m') AS yearMonth,
+        SUM(total_price) AS totalSalesAmount
+
+        FROM orders
+
+        WHERE
+        status = 'COMPLETED'
+        AND ordered_at >= STR_TO_DATE(CONCAT(#{start}, '-01'), '%Y-%m-%d')
+        AND ordered_at < DATE_ADD(
+        STR_TO_DATE(CONCAT(#{end}, '-01'), '%Y-%m-%d'),
+        INTERVAL 1 MONTH
+        )
+
+        GROUP BY
+        DATE_FORMAT(ordered_at, '%Y-%m')
+
+        ORDER BY
+        yearMonth ASC
+
+    </select>
 </mapper>

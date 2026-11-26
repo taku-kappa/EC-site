@@ -1,5 +1,7 @@
 package backend.service;
 
+import backend.dto.response.MonthlySalesListResponse;
+import backend.dto.response.MonthlySalesResponse;
 import backend.dto.response.OrderHistoryDetailResponse;
 import backend.dto.response.OrderHistoryResponse;
 import backend.dto.response.OrderItemResponse;
@@ -26,7 +28,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -292,6 +299,98 @@ public class OrderService {
 
         return response;
     }
+
+    /**
+     * 月別売上金額を取得します。
+     *
+     * @param startMonth 集計対象の開始月（YYYY-MM）
+     * @param endMonth 集計対象の終了月（YYYY-MM）
+     * @return 月別売上金額の一覧と対象月（始め・終わり）
+     */
+    public MonthlySalesListResponse getMonthlySalesList(
+            String startMonth,
+            String endMonth) {
+
+        // 開始月・終了月を年月型に変換して入力値を検証
+        YearMonth start = validateYearMonth(startMonth);
+        YearMonth end = validateYearMonth(endMonth);
+
+        // 開始月が終了月より後の場合はエラー
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException(
+                    "開始月は終了月以前の日付を指定してください。");
+        }
+
+        // Mapperから月別売上金額を取得
+        List<MonthlySalesResponse> responses =
+                orderMapper.findMonthlySales(start, end);
+
+        // 取得した売上データを年月をキーとするMapに変換
+        Map<String, Long> salesMap = new HashMap<>();
+
+        for (MonthlySalesResponse monthlySales : responses) {
+            salesMap.put(
+                    monthlySales.getYearMonth(),
+                    monthlySales.getTotalSalesAmount()
+            );
+        }
+
+        // 開始月から終了月までの月別売上データを作成
+        List<MonthlySalesResponse> monthlySalesList = new ArrayList<>();
+
+        for (YearMonth month = start;
+             !month.isAfter(end);
+             month = month.plusMonths(1)) {
+
+            // 月別売上情報を格納するDTOを生成
+            MonthlySalesResponse monthlySales = new MonthlySalesResponse();
+
+            // 対象年月を設定
+            monthlySales.setYearMonth(month.toString());
+
+            // 売上が存在しない月は0円を設定
+            monthlySales.setTotalSalesAmount(
+                    salesMap.getOrDefault(month.toString(), 0L)
+            );
+
+            monthlySalesList.add(monthlySales);
+        }
+
+        // レスポンスDTOを生成
+        MonthlySalesListResponse response = new MonthlySalesListResponse();
+
+        response.setMonthlySales(monthlySalesList);
+        response.setStartMonth(startMonth);
+        response.setEndMonth(endMonth);
+
+        return response;
+    }
+
+    /**
+     * 年月の入力値を検証してYearMonth型に変換します。
+     *
+     * @param month 検証対象の年月（YYYY-MM）
+     * @return 検証済みの年月
+     * @throws IllegalArgumentException 年月の形式が不正な場合
+     */
+    private YearMonth validateYearMonth(String month) {
+
+        // nullまたは空文字の場合はエラー
+        if (month == null || month.isBlank()) {
+            throw new IllegalArgumentException(
+                    "年月を指定してください。");
+        }
+
+        try {
+            // 年月形式を検証してYearMonth型に変換
+            return YearMonth.parse(month);
+
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException(
+                    "年月はYYYY-MM形式で指定してください。", e);
+        }
+    }
+
 }
 
 
